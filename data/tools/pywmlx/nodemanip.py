@@ -15,9 +15,10 @@ onDefineMacro = False
 def _closenode_update_dict(podict):
     if nodes[-1].sentences is not None:
         for i in nodes[-1].sentences:
-            posentence = podict.get(i.sentence)
+            dict_key = i.sentence_id
+            posentence = podict.get(dict_key)
             if posentence is None:
-                podict[i.sentence] = (
+                podict[dict_key] = (
                        nodes[-1].nodesentence_to_posentence(i) )
             else:
                 posentence.update_with_commented_string(
@@ -96,13 +97,13 @@ def closenode(closetag, mydict, lineno):
         nodes.pop()
 
 
-def addNodeSentence(sentence, *, ismultiline, lineno, lineno_sub,
-                    override, addition, plural=None):
+def addNodeSentence(sentence, *, macro=None, ismultiline, lineno,
+                    lineno_sub, override, addition, plural=None):
     global nodes
     if nodes is None:
         nodes = [pos.WmlNode(fileref=fileref, fileno=fileno,
                               tagname="", autowml=False)]
-    nodes[-1].add_sentence(sentence, ismultiline=ismultiline,
+    nodes[-1].add_sentence(sentence, macro=macro, ismultiline=ismultiline,
                            lineno=lineno, lineno_sub=lineno_sub,
                            override=override, addition=addition,
                            plural=plural)

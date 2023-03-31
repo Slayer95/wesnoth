@@ -12,7 +12,7 @@ class WmlIdleState:
         self.iffail = None
 
     def run(self, xline, lineno, match):
-        _nextstate = 'wml_checkdom'
+        _nextstate = 'wml_define'
         if pywmlx.state.machine._pending_wmlstring is not None:
             pywmlx.state.machine._pending_wmlstring.store()
             pywmlx.state.machine._pending_wmlstring = None
@@ -24,39 +24,33 @@ class WmlIdleState:
 
 
 
-'''
 class WmlDefineState:
     def __init__(self):
-        self.regex = re.compile('\s*#(define|enddef|\s+wmlxgettext:\s+)', re.I)
+        self.regex = re.compile('\s*#(define[^\S\n][^\n]+|enddef)', re.I)
         self.iffail = 'wml_checkdom'
 
     def run(self, xline, lineno, match):
-        if match.group(1).lower() == 'define':
+        directive = match.group(1).upper()
+
+        if directive.startswith('DEFINE'):
             # define
             xline = None
-            if pywmlx.nodemanip.onDefineMacro is False:
-                pywmlx.nodemanip.onDefineMacro = True
-            else:
-                err_message = ("expected an #enddef before opening ANOTHER " +
-                               "macro definition with #define")
-                finfo = pywmlx.nodemanip.fileref + ":" + str(lineno)
-                wmlerr(finfo, err_message)
-        elif match.group(1).lower() == 'enddef':
+            pywmlx.state.machine._pending_wmacroname = directive[7:].split(" ", 1)[0]
+            pywmlx.state.machine._pending_wmacroline = lineno
+        else:
             # enddef
             xline = None
-            if pywmlx.nodemanip.onDefineMacro is True:
-                pywmlx.nodemanip.onDefineMacro = False
+            if pywmlx.state.machine._pending_wmacroname is not None:
+                pywmlx.state.machine._pending_wmacroname = None
+                pywmlx.state.machine._pending_wmacroline = None
+
             else:
                 err_message = ("found an #enddef, but no macro definition " +
                                "is pending. Perhaps you forgot to put a " +
                                "#define somewhere?")
                 finfo = pywmlx.nodemanip.fileref + ":" + str(lineno)
                 wmlerr(finfo, err_message)
-        else:
-            # wmlxgettext: {WML CODE}
-            xline = xline [ match.end(): ]
         return (xline, 'wml_idle')
-'''
 
 
 
@@ -351,7 +345,7 @@ class WmlFinalState:
 
 def setup_wmlstates():
     for statename, stateclass in [ ('wml_idle', WmlIdleState),
-                                   # ('wml_define', WmlDefineState),
+                                   ('wml_define', WmlDefineState),
                                    ('wml_checkdom', WmlCheckdomState),
                                    ('wml_checkpo', WmlCheckpoState),
                                    ('wml_comment', WmlCommentState),
