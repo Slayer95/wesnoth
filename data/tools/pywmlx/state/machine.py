@@ -63,6 +63,11 @@ _pending_winfotype = None
 # If no lua functions already encountered, this var will be None
 _pending_luafuncname = None
 
+# the macro definition currently analyzed in a wml code (if any).
+# If outside of any macros, this var will be None
+_pending_wmacroname = None
+_pending_wmacroline = None
+
 # ----------
 
 # pending lua/wml string (they will be evaluated, and if translatable it will
@@ -104,14 +109,8 @@ def checksentence(mystring, finfo, *, islua=False):
     if m:
         wmlwarn(finfo, "found an empty translatable message")
         return 1
-    elif warnall() and not islua:
-        if "}" in mystring:
-            wmsg = ("found a translatable string containing a WML macro. "
-                    " Translation for this string will NEVER work")
-            wmlwarn(finfo, wmsg)
-            return 2
-        else:
-            return 0
+    elif not islua and "}" in mystring:
+        return 2
     else:
         return 0
 
@@ -221,9 +220,9 @@ class PendingLuaString:
                     loc_addedinfos = []
                 if _pending_addedinfo is not None:
                     loc_addedinfos = _pending_addedinfo
-                loc_posentence = _dictionary.get(self.luastring)
+                loc_posentence = _dictionary.get('\x01' + self.luastring)
                 if loc_posentence is None:
-                    _dictionary[self.luastring] = PoCommentedString(
+                    _dictionary['\x01' + self.luastring] = PoCommentedString(
                                 self.luastring,
                                 orderid=(fileno, self.lineno, _linenosub),
                                 ismultiline=self.ismultiline,
@@ -264,6 +263,8 @@ class PendingWmlString:
         global _pending_overrideinfo
         global _linenosub
         global _pending_winfotype
+        global _pending_wmacroname
+        global _pending_wmacroline
         if _pending_winfotype is not None:
             if self.ismultiline is False and self.istranslatable is False:
                 winf = _pending_winfotype + '=' + self.wmlstring
@@ -272,6 +273,10 @@ class PendingWmlString:
         if checkdomain() and self.istranslatable:
             finfo = pywmlx.nodemanip.fileref + ":" + str(self.lineno)
             errcode = checksentence(self.wmlstring, finfo, islua=False)
+            needs_substitution = (errcode == 2)
+            macro = None
+            if needs_substitution and _pending_wmacroname is not None and not self.israw:
+                macro = (_pending_wmacroname, pywmlx.nodemanip.fileref, _pending_wmacroline)
             if errcode != 1:
                 # when errcode is equal to 1, the translatable string is empty
                 # so, using "if errcode != 1"
@@ -282,6 +287,7 @@ class PendingWmlString:
                 else:
                     self.wmlstring = re.sub('""', r'\"', self.wmlstring)
                 pywmlx.nodemanip.addNodeSentence(self.wmlstring,
+                                             macro=macro,
                                              ismultiline=self.ismultiline,
                                              lineno=self.lineno,
                                              lineno_sub=_linenosub,
