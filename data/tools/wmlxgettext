@@ -31,14 +31,21 @@
 # that point, the source code is mainly explained on source documentation at:
 # http://wmlxgettext-unoff.readthedocs.org/en/latest/srcdoc/index.html
 
-import os
-import re
-import sys
-import signal
-import warnings
 import argparse
+from copy import copy
 from datetime import datetime
+import json
+import os
+from pprint import PrettyPrinter
+import signal
+import sys
+import warnings
 import pywmlx
+#from wesnoth.wmlparser3 import Parser
+from wesnoth.wmltools3 import CrossRef
+from wesnoth.wmlmacro import Macro, CrossRefHelper, ReferenceHelper, evaluate_multi_substitution_for_ast, parse_sentence_for_ast_and_identifiers
+
+printer = PrettyPrinter(indent=4,depth=3)
 
 
 
@@ -172,6 +179,164 @@ def commandline(args):
 
 
 
+def extractor(files, startPath, offset = 0):
+    for fileno, fx in enumerate(files):
+        if fileno < offset:
+            continue
+
+        fname = os.path.join(startPath, os.path.normpath(fx))
+        is_file = os.path.isfile(fname)
+        if is_file:
+            infile = None
+            try:
+                infile = open(fname, 'r', encoding="utf-8")
+            except OSError as e:
+                errmsg = 'cannot read file: ' + e.args[1]
+                pywmlx.wmlerr(e.filename, errmsg, OSError)
+            if fname.lower().endswith('.cfg'):
+                pywmlx.statemachine.run(filebuf=infile, fileref=fx,
+                            fileno=fileno, startstate='wml_idle', waitwml=True)
+            if fname.lower().endswith('.lua'):
+                pywmlx.statemachine.run(filebuf=infile, fileref=fx,
+                            fileno=fileno, startstate='lua_idle', waitwml=False)
+            infile.close()
+
+
+
+def handle_macro_po_sentences(sentlist, po_sentences, root_path, outfile, fuzzy):
+    ctx_macros = {}
+    asts_by_sentence = {}
+    identifiers_by_sentence = {}
+    (sentences_by_file, sentences_by_macro) = po_sentences
+    for fileref, sentences in sentences_by_file.items():
+        print("== Pending at %s ==" % (fileref))
+        for posentence in sentences:
+            lone_identifiers, complex_identifiers = {}, {}
+            ast = parse_sentence_for_ast_and_identifiers(posentence.sentence, lone_identifiers, complex_identifiers)
+            macro = Macro(*posentence.macro)
+
+            ctx_macros[macro] = True
+            asts_by_sentence[posentence.sentence] = ast
+            identifiers_by_sentence[posentence.sentence] = (lone_identifiers, complex_identifiers)
+
+            print("\n".join(map(lambda f : "#: " + f, posentence.finfos)))
+            print("#. [#define %s]" % (macro))
+            print("msgid \"%s\"" % (posentence.sentence))
+            print("msgstr \"\"")
+            print("")
+
+    args_by_macro_by_file = {} # TODO(perf): Recover for step 4
+    xrefs_by_file = {} # TODO(perf): Recover for step 4
+
+    def resolve_strings_at(filelist, single_file):
+        xrefs = CrossRef(filelist=filelist)
+        po_sentences_this_file = None
+        if single_file is not None:
+            xrefs_by_file[filelist[0]] = xrefs_by_file
+            po_sentences_this_file = sentences_by_file[single_file]
+
+        args_by_macro = {}
+        for macro in ctx_macros:
+            if single_file and macro.fileref != single_file:
+                # Ignore in single-file analysis
+                continue
+
+            printer.pprint("Analysis of %s..." % macro)
+            xref = macro.to_abs(root_path).get_ref(xrefs)
+            is_local = xref.undef is not None
+            calls_macro = False
+
+            # Issue #7522: Lack of eager evaluation causes many macros to be exported needlessly.
+            # To convince wmlxgettext that exported macros will not be passed novel parameters
+            # from different files, add the following comment to every file containing macro'd
+            # translatable strings:
+            # wmlscope: set wmlxgettext_local_macros=1
+            if not is_local and single_file is not None:
+                wmlscope_props = list(xrefs.properties.values())
+                if len(wmlscope_props) > 0 and "wmlxgettext_local_macros" in wmlscope_props[0] \
+                    and wmlscope_props[0]["wmlxgettext_local_macros"] == "1":
+                    is_local = True
+
+            if is_local:
+                printer.pprint("Macro %s is local" % macro)
+            elif single_file is not None:
+                # 4.1 Note whether there's an #undef in the same file (i.e whether 
+                #     the macro is local or global).
+                raise Exception("Macro %s is exported" % macro)
+
+            if single_file:
+                contained_sentences = [s for s in po_sentences_this_file if s.macro == macro]
+            else:
+                contained_sentences = sentences_by_macro[macro]
+            all_fps = [identifiers_by_sentence[s.sentence][0] for s in contained_sentences]
+            maybe_parameters = {k:v for fps in all_fps for k,v in fps.items()}
+            printer.pprint("May be parameters: %s" % ", ".join(maybe_parameters.keys()))
+            for identifier in maybe_parameters:
+                if not identifier in xref.args and not identifier in xref.optional_args:
+                    calls_macro = True
+                    break
+
+            if calls_macro:
+                printer.pprint("Some contained po sentence evaluates constant macro %s" % identifier)
+
+            complex_id_dicts = [identifiers_by_sentence[s.sentence][1] for s in contained_sentences]
+            complex_ids = [k for dict in complex_id_dicts for id in dict.keys()]
+            if len(complex_ids) > 0:
+                # 4.2. Note whether the macro contains quote marks or WML (error out if so.)
+                # 4.3. Note whether the macro contains conditional directives and which.
+                # TODO
+                printer.pprint("Macros called by %s: %s" % (macro, json.dumps(complex_ids)))
+
+            args_variants = ReferenceHelper.get_macro_called_args(xref, xrefs, maybe_parameters)
+            #printer.pprint("Args variants")
+            #printer.pprint(" - Raw")
+            #printer.pprint(args_variants)
+            ReferenceHelper.resolve_called_args_substitutions(args_variants, xrefs)
+            args_by_macro[macro] = args_variants
+            #printer.pprint(" - Resolved")
+            #printer.pprint(args_variants)
+
+        args_by_macro_by_file[fileref] = args_by_macro
+
+    try:
+        for fileref in sentences_by_file:
+            printer.pprint("CrossRef(filelist=[%s])" % (fileref))
+            resolve_strings_at([os.path.join(root_path, fileref)], fileref)
+    except Exception as ex:
+        printer.pprint(ex)
+        printer.pprint("Fallback to full-tree analysis")
+        resolve_strings_at([os.path.join(root_path, fileref) for fileref in sentences_by_file], None)
+
+    new_sentences = {}
+    for fileref in sentences_by_file:
+        args_by_macro = args_by_macro_by_file[fileref]
+        for macro in args_by_macro:
+            args_variants = args_by_macro[macro]
+            for po_sentence in sentences_by_macro[macro]:
+                sentence_ast = asts_by_sentence[po_sentence.sentence]
+                sentence_alternatives = evaluate_multi_substitution_for_ast(sentence_ast, args_variants)
+                for alternative in sentence_alternatives:
+                    assert(type(alternative) == tuple)
+                    assert(type(alternative[0]) == str)
+                    assert(isinstance(alternative[1], Macro))
+                    po_sentence_variant = copy(po_sentence)
+                    po_sentence_variant.sentence = alternative[0]
+                    if po_sentence_variant.sentence in sentlist:
+                        printer.pprint("Ignored ref to raw sentence %s" % po_sentence_variant.sentence)
+                        #Output has already been written. TODO: FIXME?
+                        #sentlist[po_sentence_variant.sentence].update_with_commented_string(po_sentence_variant)
+                    elif po_sentence_variant.sentence in new_sentences:
+                        printer.pprint("New ref in processed sentence %s" % po_sentence_variant.sentence)
+                        new_sentences[po_sentence_variant.sentence].update_with_commented_string(po_sentence_variant)
+                    else:
+                        printer.pprint("New sentence %s" % po_sentence_variant.sentence)
+                        new_sentences[po_sentence_variant.sentence] = po_sentence_variant
+
+    for posentence in new_sentences.values():
+        posentence.write(outfile, fuzzy)
+        print('', file=outfile)
+
+
 def main():
     signal.signal(signal.SIGINT, sigint_handler)
     args = commandline(sys.argv[1:])
@@ -180,7 +345,6 @@ def main():
     pywmlx.set_warnall(args.warnall)
     startPath = os.path.realpath(os.path.normpath(args.start_path))
     sentlist = dict()
-    fileno = 0
     fdebug = None
     if args.outfile == '-':
         args.outfile = None
@@ -223,23 +387,9 @@ def main():
         startPath, filelist = pywmlx.autof.autoscan(startPath)
     if args.sort_by_file:
         filelist.sort()
-    for fileno, fx in enumerate(filelist):
-        fname = os.path.join(startPath, os.path.normpath(fx))
-        is_file = os.path.isfile(fname)
-        if is_file:
-            infile = None
-            try:
-                infile = open(fname, 'r', encoding="utf-8")
-            except OSError as e:
-                errmsg = 'cannot read file: ' + e.args[1]
-                pywmlx.wmlerr(e.filename, errmsg, OSError)
-            if fname.lower().endswith('.cfg'):
-                pywmlx.statemachine.run(filebuf=infile, fileref=fx,
-                            fileno=fileno, startstate='wml_idle', waitwml=True)
-            if fname.lower().endswith('.lua'):
-                pywmlx.statemachine.run(filebuf=infile, fileref=fx,
-                            fileno=fileno, startstate='lua_idle', waitwml=False)
-            infile.close()
+ 
+    extractor(filelist, startPath)
+
     outfile = None
     if args.outfile is None:
         outfile = sys.stdout
@@ -268,9 +418,26 @@ def main():
     print('"MIME-Version: 1.0\\n"', file=outfile)
     print('"Content-Type: text/plain; charset=UTF-8\\n"', file=outfile)
     print('"Content-Transfer-Encoding: 8bit\\n"\n', file=outfile)
+
+    sentences_wmacro_by_file = {}
+    sentences_wmacro_by_macro = {}
+    macro_po_sentences = (sentences_wmacro_by_file, sentences_wmacro_by_macro)
     for posentence in sorted(sentlist.values(), key=lambda x: x.orderid):
-        posentence.write(outfile, args.fuzzy)
-        print('', file=outfile)
+        macro = posentence.macro
+        if macro is None:
+            posentence.write(outfile, args.fuzzy)
+            print('', file=outfile)
+        else:
+            if not macro[1] in sentences_wmacro_by_file:
+                sentences_wmacro_by_file[macro[1]] = []
+            sentences_wmacro_by_file[macro[1]].append(posentence)
+            if not macro in sentences_wmacro_by_macro:
+                sentences_wmacro_by_macro[macro] = []
+            sentences_wmacro_by_macro[macro].append(posentence)
+
+    if len(sentences_wmacro_by_file) > 0:
+        handle_macro_po_sentences(sentlist, macro_po_sentences, startPath, outfile, args.fuzzy)
+
     if args.outfile is not None:
         outfile.close()
     if args.debugmode:

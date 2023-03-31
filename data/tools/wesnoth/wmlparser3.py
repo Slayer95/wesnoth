@@ -45,6 +45,7 @@ method can be used to query the value of an attribute.
 
 import os, glob, sys, re, subprocess, argparse, tempfile, shutil
 import atexit
+from .base64url import encode_str as base64url
 
 tempdirs_to_clean = []
 tmpfiles_to_clean = []
@@ -357,6 +358,9 @@ class Parser:
         self.no_preprocess = (wesnoth_exe is None)
         self.preprocessed = None
         self.verbose = False
+        self.log_none = None
+        self.input_macros = None
+        self.output_macros = None
 
         self.last_wml_line = "?"
         self.parser_line = 0
@@ -405,31 +409,46 @@ class Parser:
             output = tempfile.mkdtemp(prefix="wmlparser_")
             tempdirs_to_clean.append(output)
 
+        output += "/" + base64url(os.path.dirname(self.path))
         self.temp_dir = output
+
+        try:
+            os.mkdir(self.temp_dir)
+        except FileExistsError:
+            pass
+
         commandline = [self.wesnoth_exe]
+        if self.log_none:
+            commandline += ["--wnoconsole"]
         if self.data_dir:
-            commandline += ["--data-dir", self.data_dir]
+            commandline += ["--data-dir", '"' + self.data_dir + '"']
         if self.config_dir:
-            commandline += ["--config-dir", self.config_dir]
-        commandline += ["--preprocess", self.path, output]
+            commandline += ["--config-dir", '"' + self.config_dir + '"']
         if defines:
-            commandline += ["--preprocess-defines", defines]
+            commandline += ["--preprocess-defines", '"' + defines + '"']
+        if self.input_macros:
+            commandline += ["--preprocess-input-macros", '"' + self.input_macros + '"']
+        if self.output_macros:
+            commandline += ["--preprocess-output-macros", '"' + self.output_macros + '"']
+
+        commandline += ["-p", '"' + self.path + '"', '"' + output + '"']
         if self.verbose:
             print((" ".join(commandline)))
+
         p = subprocess.Popen(commandline,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = p.communicate()
+                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
         if self.verbose:
-            print((out + err).decode("utf8"))
+            stdout_iterator = iter(p.stdout.readline, b"")
+            for line in stdout_iterator:
+                print(line)
+
         self.preprocessed = output + "/" + os.path.basename(self.path) + \
                             ".plain"
-        if not os.path.exists(self.preprocessed):
-            first_line = open(self.path).readline().strip()
-            raise WMLError(self, "Preprocessor error:\n" +
-                           " ".join(commandline) + "\n" +
-                           "First line: " + first_line + "\n" +
-                           out.decode("utf8") +
-                           err.decode("utf8"))
+        #if not os.path.exists(self.preprocessed):
+        #    print("Failed to preprocess file " + self.path)
+
+
 
     def parse_line_without_commands_loop(self, line: str) -> str:
         """

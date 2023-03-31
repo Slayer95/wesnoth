@@ -15,10 +15,15 @@ onDefineMacro = False
 def _closenode_update_dict(podict):
     if nodes[-1].sentences is not None:
         for i in nodes[-1].sentences:
-            posentence = podict.get(i.sentence)
+            dict_key = i.sentence_id
+            posentence = podict.get(dict_key)
             if posentence is None:
-                podict[i.sentence] = (
+                podict[dict_key] = (
                        nodes[-1].nodesentence_to_posentence(i) )
+            #elif '.wml' in posentence.finfos[0] and '.plain' in nodes[-1].fileref:
+            #    # Ignore dupe string
+            #    continue
+
             else:
                 posentence.update_with_commented_string(
                        nodes[-1].nodesentence_to_posentence(i) )
@@ -30,7 +35,7 @@ def newfile(file_ref, file_no):
     global fileno
     global nodes
     global onDefineMacro
-    onDefineMacro = False
+    onDefineMacro = False    
     fileref = file_ref
     fileno = file_no
     if nodes is not None:
@@ -96,13 +101,13 @@ def closenode(closetag, mydict, lineno):
         nodes.pop()
 
 
-def addNodeSentence(sentence, *, ismultiline, lineno, lineno_sub,
-                    override, addition, plural=None):
+def addNodeSentence(sentence, *, macro=None, ismultiline, lineno,
+                    lineno_sub, override, addition, plural=None):
     global nodes
     if nodes is None:
         nodes = [pos.WmlNode(fileref=fileref, fileno=fileno,
                               tagname="", autowml=False)]
-    nodes[-1].add_sentence(sentence, ismultiline=ismultiline,
+    nodes[-1].add_sentence(sentence, macro=macro, ismultiline=ismultiline,
                            lineno=lineno, lineno_sub=lineno_sub,
                            override=override, addition=addition,
                            plural=plural)

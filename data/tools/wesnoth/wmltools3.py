@@ -251,7 +251,8 @@ class Forest:
         for tree in self.forest:
             allfiles += tree
         return allfiles
-    def generator(self):
+
+    def __iter__(self):
         "Return a generator that walks through all files."
         for (directory, tree) in zip(self.dirpath, self.forest):
             for filename in tree:
@@ -488,11 +489,12 @@ def argmatch(formals, optional_formals, actuals, optional_actuals):
 @total_ordering
 class Reference:
     "Describes a location by file and line."
-    def __init__(self, namespace, filename, lineno=None, docstring=None, args=None,
+    def __init__(self, namespace, filename, lineno=None, lineno_end=None, docstring=None, args=None,
                  optional_args=None, deprecated=False, deprecation_level=0, removal_version=None):
         self.namespace = namespace
         self.filename = filename
         self.lineno = lineno
+        self.lineno_end = lineno_end
         self.docstring = docstring
         self.args = args
         self.optional_args = optional_args
@@ -523,7 +525,7 @@ class Reference:
             return self.filename > other.filename
 
     def mismatches(self):
-        copy = Reference(self.namespace, self.filename, self.lineno, self.docstring, self.args, self.optional_args)
+        copy = Reference(self.namespace, self.filename, self.lineno, self.lineno_end, self.docstring, self.args, self.optional_args)
         copy.undef = self.undef
         for filename in self.references:
             mis = [(ln,a,oa) for (ln,a,oa) in self.references[filename] if a is not None and not argmatch(self.args, self.optional_args, a, oa)]
@@ -575,7 +577,7 @@ class CrossRef:
         if self.exports(defn.namespace):
             # Macros and resources in subtrees with export=yes are global
             return True
-        elif not self.filelist.neighbors(defn.filename, fn):
+        elif defn.filename != fn and not self.filelist.neighbors(defn.filename, fn):
             # Otherwise, must be in the same subtree.
             return False
         else:
@@ -622,7 +624,7 @@ class CrossRef:
                             print('"%s", line %d: pruning definitions of %s' \
                                   % (filename, n+1, name ))
                         if name not in self.xref:
-                            print("wmlscope: can't prune undefined macro %s" % name, file=sys.stderr)
+                            print("xrefs: %d" % (len(self.xref)))
                         else:
                             self.xref[name] = self.xref[name][:1]
                         continue
@@ -655,7 +657,7 @@ class CrossRef:
                                   % (filename, n+1), file=sys.stderr)
                         else:
                             name = tokens[1]
-                            here = Reference(namespace, filename, n+1, line, args=tokens[2:], optional_args=[])
+                            here = Reference(namespace, filename, n+1, line, None, args=tokens[2:], optional_args=[])
                             here.hash = hashlib.md5()
                             here.docstring = line.lstrip()[8:] # Strip off #define_
                             current_docstring = None
@@ -705,6 +707,8 @@ class CrossRef:
                                             % (here, name, defn), file=sys.stderr)
                         if name not in self.xref:
                             self.xref[name] = []
+
+                        here.lineno_end = n+1
                         self.xref[name].append(here)
                         state = States.OUTSIDE
                     elif state == States.MACRO_HEADER and line.strip():
@@ -781,10 +785,15 @@ class CrossRef:
         except UnicodeDecodeError as e:
             print('wmlscope: "{}" is not a valid UTF-8 file'.format(filename), file=sys.stderr)
 
-    def __init__(self, dirpath=[], exclude="", warnlevel=0, progress=False):
+    def __init__(self, dirpath=[], filelist=None, exclude="", warnlevel=0, progress=False):
         "Build cross-reference object from the specified filelist."
-        self.filelist = Forest(dirpath, exclude)
-        self.dirpath = [x for x in dirpath if not re.search(exclude, x)]
+        if filelist is None:
+            self.filelist = Forest(dirpath, exclude)
+            self.dirpath = [x for x in dirpath if not re.search(exclude, x)]
+        else:
+            self.filelist = [(os.path.dirname(filename), filename) for filename in filelist]
+            self.dirpath = []
+            
         self.warnlevel = warnlevel
         self.xref = {}
         self.fileref = {}
@@ -794,7 +803,7 @@ class CrossRef:
         all_in = []
         if self.warnlevel >=2 or progress:
             print("*** Beginning definition-gathering pass...")
-        for (namespace, filename) in self.filelist.generator():
+        for (namespace, filename) in self.filelist:
             all_in.append((namespace, filename))
             if self.warnlevel > 1:
                 print(filename + ":")
@@ -831,16 +840,30 @@ class CrossRef:
                         beneath = 0
                         ignoreflag = False
                         in_macro_definition = False
+                        in_arg_definition = False
                         for (n, line) in enumerate(rfp):
                             if line.strip().startswith("#define"):
+                                if in_macro_definition:
+                                    raise Exception('Unexpected "%s" directive, line %d' % ('#define', n+1))
                                 formals = line.strip().split()[2:]
                                 in_macro_definition = True
                             elif line.startswith("#enddef"):
+                                if in_arg_definition or not in_macro_definition:
+                                    raise Exception('Unexpected "%s" directive, line %d' % ('#enddef', n+1))
                                 formals = []
                                 optional_formals = []
                                 in_macro_definition = False
-                            elif in_macro_definition and line.startswith("#arg"):
-                                optional_formals.append(line.strip().split()[1])
+                            elif line.startswith("#arg"):
+                                if in_arg_definition or not in_macro_definition:
+                                    raise Exception('Unexpected "%s" directive, line %d' % ('#arg', n+1))
+                                optional_formals.append([line.strip().split()[1], ""])
+                                in_arg_definition = True
+                            elif line.startswith("#endarg"):
+                                if not in_arg_definition:
+                                    raise Exception('Unexpected "%s" directive, line %d' % ('#endarg', n+1))
+                                in_arg_definition = False
+                            elif in_arg_definition:
+                                optional_formals[-1][1] += line
                             comment = ""
                             if '#' in line:
                                 if "# wmlscope: start ignoring" in line:

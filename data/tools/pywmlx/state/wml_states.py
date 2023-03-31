@@ -2,6 +2,7 @@ import re
 import pywmlx.state.machine
 from pywmlx.state.state import State
 import pywmlx.nodemanip
+import pywmlx.tracing
 from pywmlx.wmlerr import wmlerr
 
 
@@ -12,7 +13,7 @@ class WmlIdleState:
         self.iffail = None
 
     def run(self, xline, lineno, match):
-        _nextstate = 'wml_checkdom'
+        _nextstate = 'wml_define'
         if pywmlx.state.machine._pending_wmlstring is not None:
             pywmlx.state.machine._pending_wmlstring.store()
             pywmlx.state.machine._pending_wmlstring = None
@@ -24,28 +25,124 @@ class WmlIdleState:
 
 
 
-'''
+# In fact, Wesnoth's engine expands macros in the preprocessor step.
+# Therefore, the input below ran through wmlxgettext should output
+#
+# msgid "Hello, world."
+# msgstr ""
+#
+# # define GREET MODE WHOM
+# [{MODE}]
+#     {MODE} = _ "Hello, {WHOM}."
+# [/{MODE}]
+# # enddef
+#
+# {GREET message world}
+#
+# To accomplish that through all macro calls and subcalls, we identify
+# three types of macro calls according to their context.
+# A. Inside translatable strings.
+# B. Inside macro definitions, but not inside a string.
+# C. Every other macro call (top level).
+#
+# The simplest case is that macro type A is called directly by
+# a single macro type C. In that case, we:
+# 1. Identify the parameter index "n" in the definition of macro C,
+#    associated with the call of macro A.
+# 2. Substitute the nth parameter of macro C into the string containing
+#    macro call A.
+#
+# There are several factors that complicate it:
+# 1. There may be one or more macros of type B. We need to track their
+#    parameters as well.
+# 2. There may be more than one macro of type C. Each of them represents
+#    a new string in the output.
+# 3. It's possible the parameters of macro(s) type B and C aren't a 1:1
+#    match.
+# 4. Since Wesnoth 1.13.7, named optional macro parameters are available.
+#    through the directive #arg
+# 5. Macros may be deleted with #undef and later redefined.
+#
+# For example, let
+#
+# # define MOODY_GREET MODE QUALIFIER WHOM
+#   {GREET {MODE} (very {QUALIFIER} {WHOM})}
+# # enddef
+#
+# {MOODY_GREET message good world}
+# {MOODY_GREET message bad world}
+#
+# We know that GREET's relevant parameter is the second, and it's affected by
+# the second and third parameters of MOODY_GREET. Fortunately, MOODY_GREET has
+# a finite universe of possible parameters, so we iterate through all of them
+# in a cartesian product fashion, and we get
+#
+# msgid "Hello, very good world."
+# msgstr ""
+#
+# msgid "Hello, very bad world."
+# msgstr ""
+#
+# Note that $substitutions are bad practice for localizable strings,
+# as the translator will only be able to relocate the variable, and not
+# act according to their possible values. Many languages have lots of
+# conditional declensions, which warrant exhausting all combinations.
+# Those *are* provided by macros.
+#
+#
+# New strategy:
+# 1. Identify all strings which require preprocessing, and their textdomain.
+# 2. Identify type-C macros that contain such strings in their expansions.
+# 3. Identify files with such type-C macros, and with the same textdomain.
+# 4. Use wmlparser3.py to preprocess those files.
+#    Parser()
+#    import wesnoth.wmlparser3.Parser as Parser
+#    p = Parser()
+#    p.preprocess(defines: string[])
+#
+# 6. Run those files through pywmlx extractor.
+#
+# Preprocessor output is awful
+# New new strategy:
+# 1. Identify all strings which require preprocessing, as well as their
+#    associated textdomain, reference (file name, line number), and
+#    parent macro definition.
+#
+# 2. Copy cfg files with candidate strings to a temp dir.
+# 3. Use wesnoth.wmltools3 to parse macro definitions and callsites on the temp dir.
+#    If any of the macros from (1) is non-local, fall back to 4. Otherwise, go to 5.
+# 4. Use wesnoth.wmltools3 to parse macro definitions and callsites on the entire addon.
+#    Considerations
+#    4.1 Note whether there's an #undef in the same file (i.e whether 
+#        the macro is local or global).
+#    4.2. Note whether the macro contains quote marks or WML (error out if so.)
+#    4.3. Note whether the macro contains conditional directives and which.
+# 
+# 5. Recursively identify all macro callsites with expansions that include
+#    strings in (1).
+# 6. Propagate macro parameters and evaluate the strings in (1).
+#
 class WmlDefineState:
     def __init__(self):
-        self.regex = re.compile('\s*#(define|enddef|\s+wmlxgettext:\s+)', re.I)
+        self.regex = re.compile('\s*#(define[ |\t][^\n]+|enddef|\s+wmlxgettext:\s+)', re.I)
         self.iffail = 'wml_checkdom'
 
     def run(self, xline, lineno, match):
-        if match.group(1).lower() == 'define':
+        directive = match.group(1).upper()
+
+        if directive.startswith('DEFINE '):
             # define
+            
             xline = None
-            if pywmlx.nodemanip.onDefineMacro is False:
-                pywmlx.nodemanip.onDefineMacro = True
-            else:
-                err_message = ("expected an #enddef before opening ANOTHER " +
-                               "macro definition with #define")
-                finfo = pywmlx.nodemanip.fileref + ":" + str(lineno)
-                wmlerr(finfo, err_message)
-        elif match.group(1).lower() == 'enddef':
+            pywmlx.state.machine._pending_wmacroname = directive[7:].split(" ", 1)[0]
+            pywmlx.state.machine._pending_wmacroline = lineno
+        elif directive == 'ENDDEF':
             # enddef
             xline = None
-            if pywmlx.nodemanip.onDefineMacro is True:
-                pywmlx.nodemanip.onDefineMacro = False
+            if pywmlx.state.machine._pending_wmacroname is not None:
+                pywmlx.state.machine._pending_wmacroname = None
+                pywmlx.state.machine._pending_wmacroline = None
+
             else:
                 err_message = ("found an #enddef, but no macro definition " +
                                "is pending. Perhaps you forgot to put a " +
@@ -56,7 +153,6 @@ class WmlDefineState:
             # wmlxgettext: {WML CODE}
             xline = xline [ match.end(): ]
         return (xline, 'wml_idle')
-'''
 
 
 
@@ -351,7 +447,7 @@ class WmlFinalState:
 
 def setup_wmlstates():
     for statename, stateclass in [ ('wml_idle', WmlIdleState),
-                                   # ('wml_define', WmlDefineState),
+                                   ('wml_define', WmlDefineState),
                                    ('wml_checkdom', WmlCheckdomState),
                                    ('wml_checkpo', WmlCheckpoState),
                                    ('wml_comment', WmlCommentState),

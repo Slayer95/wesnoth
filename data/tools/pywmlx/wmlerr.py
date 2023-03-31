@@ -140,7 +140,7 @@ def my_showwarning(message, category, filename, lineno, file=None, line=None):
 
 
 
-warnings.showwarning = my_showwarning
+#warnings.showwarning = my_showwarning
 
 
 
