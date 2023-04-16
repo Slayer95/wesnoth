@@ -16,7 +16,7 @@
 #   * unbalanced tags
 #   * strings that need a translation mark and do not have them
 #   * strings that have a translation mark and should not
-#   * translatable strings containing macro references
+#   * translatable strings containing substitutions
 #   * filter references by id= not matched by an actual unit
 #   * consistency between recruit= and recruitment_pattern= instances
 #   * unknown unit types in recruitment lists
@@ -2469,9 +2469,9 @@ to be called on their own".format(filename, num))
                 # Doing a better job would require tokenizing to pick up the
                 # string boundaries. I'd do it, but AI0867 is already working
                 # on a parser-based wmllint.
-                if '{' in value and "+" not in value and value.find('{') > value.find("_"):
-                    print('"%s", line %d: macro reference in translatable string'\
-                          % (filename, i+1))
+                if '$' in value and "+" not in value and value.find('$') > value.find("_"):
+                    print('"%s", line %d: variable substitution in translatable string not localization-\
+friendly (use macro substitution instead)' % (filename, i+1))
             # Check correctness of translation marks and descriptions
             if key.startswith("{"):
                 pass
