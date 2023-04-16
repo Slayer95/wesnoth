@@ -370,7 +370,7 @@ def handle_macro_po_sentences(sentlist, po_sentences, start_path="", fileref_roo
                     print("Unsupported macro \"%s\" in \"%s\". String will not be translated." % (complex_ids[0], s.sentence))
                 pass
 
-            is_local or single_file is None
+            assert is_local or single_file is None
             args_variants = ReferenceHelper.get_macro_called_args(xref, xrefs, maybe_parameters)
             if len(args_variants) == 0:
                 for s in sentences_by_macro[macro]:

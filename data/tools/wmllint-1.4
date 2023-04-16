@@ -13,7 +13,7 @@
 #   * unbalanced tags
 #   * strings that need a translation mark and should not have them
 #   * strings that have a translation mark and should not
-#   * translatable strings containing macro references
+#   * translatable strings containing substitutions
 #   * filter references by description= not matched by an actual unit
 #   * abilities or traits without matching special notes, or vice-versa
 #   * consistency between recruit= and recruitment_pattern= instances
@@ -832,9 +832,9 @@ def sanity_check(filename, lines):
             if key == 'role':
                 present.append(value)
             if has_tr_mark:
-                if '{' in value:
-                    print('"%s", line %d: macro reference in translatable string' %
-                          (filename, i+1))
+                if '$' in value:
+                    print('"%s", line %d: variable substitution in translatable string not localization-\
+                          friendly (use macro substitution instead)' % (filename, i+1))
                 if future and re.search("[.,!?]  ", line):
                     print('"%s", line %d: extraneous space in translatable string' %
                           (filename, i+1))
