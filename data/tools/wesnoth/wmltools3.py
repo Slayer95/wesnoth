@@ -251,7 +251,8 @@ class Forest:
         for tree in self.forest:
             allfiles += tree
         return allfiles
-    def generator(self):
+
+    def __iter__(self):
         "Return a generator that walks through all files."
         for (directory, tree) in zip(self.dirpath, self.forest):
             for filename in tree:
@@ -299,8 +300,6 @@ def parse_macroref(start, line):
         # stop matching on the first one, because the argument value might contain one too
         if re.match(r"^([A-Z0-9_]+?)=", arg):
             opt_arg, arg = arg.split("=", 1)
-        if arg.startswith('"') and arg.endswith('"'):
-            arg = arg[1:-1].strip()
         if opt_arg:
             optional_args[opt_arg] = arg
             opt_arg = ""
@@ -488,14 +487,17 @@ def argmatch(formals, optional_formals, actuals, optional_actuals):
 @total_ordering
 class Reference:
     "Describes a location by file and line."
-    def __init__(self, namespace, filename, lineno=None, docstring=None, args=None,
+    def __init__(self, namespace, filename, lineno=None, lineno_end=None, docstring=None, args=None,
                  optional_args=None, deprecated=False, deprecation_level=0, removal_version=None):
         self.namespace = namespace
         self.filename = filename
         self.lineno = lineno
+        self.lineno_end = lineno_end
         self.docstring = docstring
         self.args = args
-        self.optional_args = optional_args
+        self._optional_args = optional_args
+        self.optional_args = {}
+        self.body = []
         self.deprecated = deprecated
         self.deprecation_level = deprecation_level
         self.removal_version = removal_version
@@ -523,7 +525,7 @@ class Reference:
             return self.filename > other.filename
 
     def mismatches(self):
-        copy = Reference(self.namespace, self.filename, self.lineno, self.docstring, self.args, self.optional_args)
+        copy = Reference(self.namespace, self.filename, self.lineno, self.lineno_end, self.docstring, self.args, self._optional_args)
         copy.undef = self.undef
         for filename in self.references:
             mis = [(ln,a,oa) for (ln,a,oa) in self.references[filename] if a is not None and not argmatch(self.args, self.optional_args, a, oa)]
@@ -575,7 +577,7 @@ class CrossRef:
         if self.exports(defn.namespace):
             # Macros and resources in subtrees with export=yes are global
             return True
-        elif not self.filelist.neighbors(defn.filename, fn):
+        elif defn.filename != fn and not self.filelist.neighbors(defn.filename, fn):
             # Otherwise, must be in the same subtree.
             return False
         else:
@@ -655,7 +657,7 @@ class CrossRef:
                                   % (filename, n+1), file=sys.stderr)
                         else:
                             name = tokens[1]
-                            here = Reference(namespace, filename, n+1, line, args=tokens[2:], optional_args=[])
+                            here = Reference(namespace, filename, n+1, line, None, args=tokens[2:], optional_args=[])
                             here.hash = hashlib.md5()
                             here.docstring = line.lstrip()[8:] # Strip off #define_
                             current_docstring = None
@@ -689,6 +691,8 @@ class CrossRef:
                             current_docstring = None
                             state = States.OUTSIDE
                     elif state != States.OUTSIDE and line.strip().endswith("#enddef"):
+                        end_def_index = line.index("#enddef")
+                        here.body.append(line[0:end_def_index])
                         here.hash.update(line.encode("utf8"))
                         here.hash = here.hash.digest()
                         if name in self.xref:
@@ -705,15 +709,22 @@ class CrossRef:
                                             % (here, name, defn), file=sys.stderr)
                         if name not in self.xref:
                             self.xref[name] = []
+
+                        here.lineno_end = n+1
                         self.xref[name].append(here)
                         state = States.OUTSIDE
                     elif state == States.MACRO_HEADER and line.strip():
                         if line.strip().startswith("#arg"):
                             state = States.MACRO_OPTIONAL_ARGUMENT
-                            here.optional_args.append(line.strip().split()[1])
+                            here._optional_args.append([line.strip().split()[1],""])
                         elif line.strip()[0] != "#":
                             state = States.MACRO_BODY
-                    elif state == States.MACRO_OPTIONAL_ARGUMENT and "#endarg" in line:
+                    elif state == States.MACRO_OPTIONAL_ARGUMENT and not "#endarg" in line:
+                        here._optional_args[-1][1] += line
+                    elif state == States.MACRO_OPTIONAL_ARGUMENT:
+                        end_arg_index = line.index("#endarg")
+                        here._optional_args[-1][1] += line[0:end_arg_index]
+                        here.optional_args = dict(here._optional_args)
                         state = States.MACRO_HEADER
                         continue
                     if state == States.MACRO_HEADER:
@@ -738,6 +749,8 @@ class CrossRef:
                                 print("Deprecation line not matched found in {}, line {}".format(filename, n+1), file=sys.stderr)
                         else:
                             here.docstring += line.lstrip()[1:]
+                    if state == States.MACRO_BODY:
+                        here.body.append(line)
                     if state in (States.MACRO_HEADER, States.MACRO_OPTIONAL_ARGUMENT, States.MACRO_BODY):
                         here.hash.update(line.encode("utf8"))
                     elif line.strip().startswith("#undef"):
@@ -781,10 +794,16 @@ class CrossRef:
         except UnicodeDecodeError as e:
             print('wmlscope: "{}" is not a valid UTF-8 file'.format(filename), file=sys.stderr)
 
-    def __init__(self, dirpath=[], exclude="", warnlevel=0, progress=False):
+    def __init__(self, dirpath=[], filelist=None, exclude="", warnlevel=0, progress=False):
         "Build cross-reference object from the specified filelist."
-        self.filelist = Forest(dirpath, exclude)
-        self.dirpath = [x for x in dirpath if not re.search(exclude, x)]
+        if filelist is None:
+            self.filelist = Forest(dirpath, exclude)
+            self.dirpath = [x for x in dirpath if not re.search(exclude, x)]
+        else:
+            # All specified files share the same namespace
+            self.filelist = [("src", filename) for filename in filelist]
+            self.dirpath = ["src"]
+            
         self.warnlevel = warnlevel
         self.xref = {}
         self.fileref = {}
@@ -794,7 +813,7 @@ class CrossRef:
         all_in = []
         if self.warnlevel >=2 or progress:
             print("*** Beginning definition-gathering pass...")
-        for (namespace, filename) in self.filelist.generator():
+        for (namespace, filename) in self.filelist:
             all_in.append((namespace, filename))
             if self.warnlevel > 1:
                 print(filename + ":")
@@ -968,9 +987,10 @@ class CrossRef:
                 except UnicodeDecodeError as e:
                     pass # to not have the invalid UTF-8 file warning printed twice
         # Check whether each namespace has a defined export property
-        for namespace in self.dirpath:
-            if namespace not in self.properties or "export" not in self.properties[namespace]:
-                print("warning: %s has no export property" % namespace)
+        if self.warnlevel >= 1:
+            for namespace in self.dirpath:
+                if namespace not in self.properties or "export" not in self.properties[namespace]:
+                    print("warning: %s has no export property" % namespace)
     def exports(self, namespace):
         return namespace in self.properties and self.properties[namespace].get("export") == "yes"
     def subtract(self, filelist):
