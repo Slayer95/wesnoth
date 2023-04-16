@@ -37,16 +37,16 @@ silenceErrors = {}
 def wmlfind(element, wmlItor):
     """Find a simple element from traversing a WML iterator"""
     for itor in wmlItor.copy():
-        if element == itor.element:
+        if element == itor.element[0]:
             return itor
     return None
 
 def wmlfindin(element, scopeElement, wmlItor):
     """Find an element inside a particular type of scope element"""
     for itor in wmlItor.copy():
-        if element == itor.element:
+        if element == itor.element[0]:
             if itor.scopes:
-                if scopeElement == itor.scopes[-1].element:
+                if scopeElement == itor.scopes[-1].element[0]:
                     return itor
             elif not scopeElement:
                 # allow searching in the empty scope
@@ -57,44 +57,44 @@ def wmlfindin(element, scopeElement, wmlItor):
 def isDirective(elem):
     "Identify things that shouldn't be indented."
     if isinstance(elem, WmlIterator):
-        elem = elem.element
+        elem = elem.element[0]
     return elem.startswith(("#ifdef", "#ifndef", "#ifhave", "#ifnhave", "#ifver", "#ifnver", "#else", "#endif", "#define", "#enddef", "#undef"))
 
 
 def isCloser(elem):
     "Are we looking at a closing tag?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element
+        elem = elem.element[0]
     return type(elem) == type("") and elem.startswith("[/")
 
 def isMacroCloser(elem):
     "Are we looking at a macro closer?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element
+        elem = elem.element[0]
     return type(elem) == type("") and elem == closeMacroType
 
 def isOpener(elem):
     "Are we looking at an opening tag?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element
+        elem = elem.element[0]
     return type(elem) == type("") and elem.startswith("[") and not isCloser(elem)
 
 def isExtender(elem):
     "Are we looking at an extender tag?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element
+        elem = elem.element[0]
     return type(elem) == type("") and elem.startswith("[+")
 
 def isMacroOpener(elem):
     "Are we looking at a macro opener?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element
+        elem = elem.element[0]
     return type(elem) == type("") and elem.startswith("{")
 
 def isAttribute(elem):
     "Are we looking at an attribute (or attribute tuple)?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element
+        elem = elem.element[0]
     if type(elem) == type(()):
         elem = elem[0]
     return type(elem) == type("") and elem.endswith("=")
@@ -116,8 +116,9 @@ Important Attributes:
     scopes - this is an internal list of all open scopes (as iterators)
              note: when retrieving an iterator from this list, always
              use a copy to perform seek() or next(), and not the original
-    element - the wml tag, key, or macro name for this logical line
-              (in complex cases, this may be a tuple of elements...
+    element - tuple containing the wml tag, key, or macro name for
+              this logical line, together with the position it was found in
+              (in complex cases, the former might be a tuple of elements...)
               see parseElements for list of possible values)
     text - the exact text of this logical line, as it appears in the
            original source, and ending with a newline
@@ -325,7 +326,7 @@ Important Attributes:
             while scopeDelta > 0:
                 openedScopes.append(elem)
                 scopeDelta -= 1
-            resultElements.append(elem)
+            resultElements.append((elem, sortPos))
         return resultElements, openedScopes
 
     def printScopeError(self, elementType):
@@ -351,7 +352,7 @@ Important Attributes:
         self.nextScopes = []
         self.text = ""
         self.span = 1
-        self.element = ""
+        self.element = None
         return self
 
     def seek(self, lineno, clearEnd=True):
@@ -431,9 +432,9 @@ Important Attributes:
             copyItor.element = elem
             self.nextScopes.append(copyItor)
             copyItor.nextScopes.append(copyItor)
-        if(len(self.element) == 1):
+        if(len(self.element[0]) == 1):
             # currently we only wish to handle simple single assignment syntax
-            self.element = self.element[0]
+            self.element[0] = self.element[0][0]
         if self.endScope is not None and not self.scopes.count(self.endScope):
             raise StopIteration
         return self
