@@ -25,6 +25,7 @@ Limitations:
 from functools import total_ordering
 import sys, re, copy, codecs
 import fnmatch
+import json
 keyPattern = re.compile('(\w+)(,\s?\w+)*\s*=')
 keySplit = re.compile(r'[=,\s]')
 tagPattern = re.compile(r'(^|(?<![\w|}]))(\[/?\+?[a-z _]+\])')
@@ -37,16 +38,16 @@ silenceErrors = {}
 def wmlfind(element, wmlItor):
     """Find a simple element from traversing a WML iterator"""
     for itor in wmlItor.copy():
-        if element == itor.element[0]:
+        if element == itor.element:
             return itor
     return None
 
 def wmlfindin(element, scopeElement, wmlItor):
     """Find an element inside a particular type of scope element"""
     for itor in wmlItor.copy():
-        if element == itor.element[0]:
+        if element == itor.element:
             if itor.scopes:
-                if scopeElement == itor.scopes[-1].element[0]:
+                if scopeElement == itor.scopes[-1].element:
                     return itor
             elif not scopeElement:
                 # allow searching in the empty scope
@@ -57,44 +58,44 @@ def wmlfindin(element, scopeElement, wmlItor):
 def isDirective(elem):
     "Identify things that shouldn't be indented."
     if isinstance(elem, WmlIterator):
-        elem = elem.element[0]
+        elem = elem.element
     return elem.startswith(("#ifdef", "#ifndef", "#ifhave", "#ifnhave", "#ifver", "#ifnver", "#else", "#endif", "#define", "#enddef", "#undef"))
 
 
 def isCloser(elem):
     "Are we looking at a closing tag?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element[0]
+        elem = elem.element
     return type(elem) == type("") and elem.startswith("[/")
 
 def isMacroCloser(elem):
     "Are we looking at a macro closer?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element[0]
+        elem = elem.element
     return type(elem) == type("") and elem == closeMacroType
 
 def isOpener(elem):
     "Are we looking at an opening tag?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element[0]
+        elem = elem.element
     return type(elem) == type("") and elem.startswith("[") and not isCloser(elem)
 
 def isExtender(elem):
     "Are we looking at an extender tag?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element[0]
+        elem = elem.element
     return type(elem) == type("") and elem.startswith("[+")
 
 def isMacroOpener(elem):
     "Are we looking at a macro opener?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element[0]
+        elem = elem.element
     return type(elem) == type("") and elem.startswith("{")
 
 def isAttribute(elem):
     "Are we looking at an attribute (or attribute tuple)?"
     if isinstance(elem, WmlIterator):
-        elem = elem.element[0]
+        elem = elem.element
     if type(elem) == type(()):
         elem = elem[0]
     return type(elem) == type("") and elem.endswith("=")
@@ -141,6 +142,12 @@ Important Attributes:
         self.lines = lines
         self.reset()
         self.seek(begin)
+
+    @property
+    def element(self):
+        if self._element is None or len(self._element) == 0:
+            return ""
+        return self._element[0]
 
     def parseQuotes(self, lines):
         """Return the line or multiline text if a quote spans multiple lines"""
@@ -352,7 +359,7 @@ Important Attributes:
         self.nextScopes = []
         self.text = ""
         self.span = 1
-        self.element = None
+        self._element = None
         return self
 
     def seek(self, lineno, clearEnd=True):
@@ -377,13 +384,13 @@ Important Attributes:
 
     def ancestors(self):
         """Return a list of tags enclosing this location, outermost first."""
-        return tuple([x.element for x in self.scopes])
+        return tuple([x.element[0] for x in self.scopes])
 
     def glob_ancestors(self, pattern):
         """Returns True if at least one ancestor matches the supplied
         case-sensitive glob pattern"""
         for scope in self.scopes:
-            if fnmatch.fnmatchcase(scope.element, pattern):
+            if fnmatch.fnmatchcase(scope.element[0], pattern):
                 return True
         return False
 
@@ -424,17 +431,17 @@ Important Attributes:
         self.lineno = self.lineno + self.span
         self.text, self.span = self.parseQuotes(self.lines)
         self.scopes.extend(self.nextScopes)
-        self.element, nextScopes = self.parseElements(self.text)
+        self._element, nextScopes = self.parseElements(self.text)
         self.nextScopes = []
         for elem in nextScopes:
         # remember scopes by storing a copy of the iterator
             copyItor = self.copy()
-            copyItor.element = elem
+            copyItor._element = (elem,)
             self.nextScopes.append(copyItor)
             copyItor.nextScopes.append(copyItor)
-        if(len(self.element[0]) == 1):
+        if(len(self._element) > 0 and len(self._element[0]) == 1):
             # currently we only wish to handle simple single assignment syntax
-            self.element[0] = self.element[0][0]
+            self._element[0] = self._element[0][0]
         if self.endScope is not None and not self.scopes.count(self.endScope):
             raise StopIteration
         return self

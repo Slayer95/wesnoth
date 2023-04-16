@@ -1491,7 +1491,7 @@ def hack_syntax(filename, lines):
             no_indent = []
             insideElem = 0
             for i in scopeIter:
-                elem = i.element[0]
+                elem = i.element
                 if elem in ("[and]", "[or]", "[not]"):
                     radius_danger = True
                     no_indent.extend(txt+'\n' for txt in i.text.splitlines())
@@ -1577,7 +1577,7 @@ def hack_syntax(filename, lines):
         duplist = {}
         while name_pos is not None:
             key = lines[name_pos.lineno].strip()
-            context = [x.element[0] for x in name_pos.scopes]
+            context = [x.element for x in name_pos.scopes]
             if '[attack]' in context:
                 if key not in duplist:
                     duplist[key] = []
