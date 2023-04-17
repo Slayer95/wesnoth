@@ -784,6 +784,17 @@ const config::attribute_value* config::get(config_key_type key) const
 	return i != values_.end() ? &i->second : nullptr;
 }
 
+/**
+ * Chooses a value. If the value specified by @a key is
+ * blank, then @a default_key is chosen instead.
+ */
+const config::attribute_value & config::get_or(const config_key_type key, const config_key_type default_key)
+{
+    check_valid()
+    const config::attribute_value & value = operator[](key);
+    return !value.blank() ? value : operator[](default_key);
+}
+
 config::attribute_value& config::operator[](config_key_type key)
 {
 	check_valid();

@@ -91,5 +91,8 @@ private:
 
 unit_race::GENDER string_gender(const std::string& str,unit_race::GENDER def=unit_race::MALE);
 const std::string& gender_string(unit_race::GENDER gender);
+inline const config::attribute_value & gender_value(
+    const config & cfg, unit_race::GENDER gender, const std::string & male_key,
+    const std::string & female_key, const std::string & default_key)
 
 typedef std::map<std::string,unit_race> race_map;
