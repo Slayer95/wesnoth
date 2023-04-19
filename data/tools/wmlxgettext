@@ -40,8 +40,10 @@ import sys
 import warnings
 import pywmlx
 from wesnoth.wmltools3 import CrossRef
-from wesnoth.wmlmacro import AST, Macro, CrossRefHelper, ReferenceHelper
+from wesnoth.wmlmacro import AST, Macro, CrossRefHelper, ReferenceHelper, GlobalWMLMacros
 
+from pprint import PrettyPrinter
+pp = PrettyPrinter(indent=4)
 
 def commandline(args):
     parser = argparse.ArgumentParser(
@@ -173,6 +175,9 @@ def commandline(args):
 
 
 
+class AnalysisTooNarrowException(Exception):
+    pass
+
 def extractor(files, fileref_root, offset = 0):
     for fileno, fx in enumerate(files):
         if fileno < offset:
@@ -275,28 +280,27 @@ def handle_macro_po_sentences(sentlist, po_sentences, start_path="", fileref_roo
     #    2.3. Otherwise, go to (4).
     #
     # 3. Use wmltools3.CrossRef to parse macro definitions and callsites on the entire addon.
-    #    3.1. Note whether the macro contains quote marks or WML (error out if so.)
-    #    3.2. Note whether the macro contains conditional directives and which.
-    #    3.3. Go to (4).
+    #    3.1. Note whether the macro contains quote marks or is multiline (error out if so.)
+    #    3.2. Go to (4).
     # 
     # 4. Deeply identify all macro callsites with expansions that include
     #    strings in (1).
     # 5. Propagate macro parameters.
-    # 6. Evaluate the strings in (1).
+    # 6. Evaluate macro expansions.
     #
     ctx_macros = {}
-    asts_by_sentence = {}
     ids_by_sentence = {}
+    asts_by_sentence = {}
     (sentences_by_file, sentences_by_macro) = po_sentences
     for fileref, sentences in sentences_by_file.items():
         for posentence in sentences:
-            lone_identifiers, complex_identifiers = {}, {}
+            lone_identifiers, complex_identifiers = set(), set()
             # Fill-in lone_identifiers, complex_identifiers
-            ast = AST.parse_sentence_with_ids(posentence.sentence, lone_identifiers, complex_identifiers)
+            ast = AST.parse_sentence_and_ids(posentence.sentence, lone_identifiers, complex_identifiers)
             macro = Macro(*posentence.macro)
 
-            ctx_macros[macro] = True
             asts_by_sentence[posentence.sentence] = ast
+            ctx_macros[macro] = True
             ids_by_sentence[posentence.sentence] = (lone_identifiers, complex_identifiers)
 
     args_by_macro = {}
@@ -304,11 +308,13 @@ def handle_macro_po_sentences(sentlist, po_sentences, start_path="", fileref_roo
     xrefs_all = None
 
     def resolve_strings_at(dirpath=None, single_file=None):
+        nonlocal xrefs_all
+
         if dirpath is None:
             # 2. Use wmltools3.CrossRef to parse macro definitions and callsites.
             filelist = [os.path.normpath(os.path.join(fileref_root, single_file))]
             xrefs = CrossRef(filelist=filelist)
-            xrefs_by_file[filelist[0]] = xrefs_by_file # filelist[0] abs path
+            xrefs_by_file[filelist[0]] = xrefs # filelist[0] abs path
         else:
             # 3. Use wmltools3.CrossRef to parse macro definitions and callsites on the entire addon.
             xrefs = CrossRef(dirpath=dirpath)
@@ -321,48 +327,56 @@ def handle_macro_po_sentences(sentlist, po_sentences, start_path="", fileref_roo
 
             # print("Tracing %s..." % macro)
             xref = macro.to_abs(fileref_root).get_ref(xrefs)
-            if xref is None:
-                print("Macro %s not referenced" % macro)
-                continue
+            assert xref is not None, ("Macro %s not referenced" % macro)
 
             is_local = xref.undef is not None
             if not is_local and single_file is not None:
                 # 2.1 Note whether there's an #undef in the same file (i.e whether 
                 #     the macro is local or global).
                 # 2.2. If any of the macros from (1) is non-local, fall back to (3).
-                raise Exception("Macro %s is exported" % macro)
+                raise AnalysisTooNarrowException("Macro %s is exported" % macro)
 
             contained_sentences = sentences_by_macro[macro]
 
-            # lone identifiers collection    : list<dict>
-            all_params_dicts = [ids_by_sentence[s.sentence][0] for s in contained_sentences]
-            # complex identifiers collection : list<dict>
-            complex_id_dicts = [ids_by_sentence[s.sentence][1] for s in contained_sentences]
+            # Intermediate values in extraction of parameters and macros
+            # used by translatable sentences.
 
-            # maybe_parameters: dict<str, bool>
-            maybe_parameters = {k:v for fps in all_params_dicts for k,v in fps.items()}
-            # macro names with 0 arguments: list<str>
-            not_parameters = [id for id in maybe_parameters if not id in xref.args and not id in xref.optional_args]
-            # macro names with 1+ arguments: list<str>
-            complex_ids = [id for d in complex_id_dicts for id in d.keys()]
+            # lone identifiers    : list<set<string>>
+            all_params_sets = [ids_by_sentence[s.sentence][0] for s in contained_sentences]
+            # complex identifiers : list<set<string>>
+            complex_id_sets = [ids_by_sentence[s.sentence][1] for s in contained_sentences]
+            # maybe_parameters    : set<str>
+            maybe_parameters = set.union(*all_params_sets)
 
-            if len(not_parameters) > 0:
-                # TODO: Support it in MacroCallNode.replace()
-                for s in sentences_by_macro[macro]:
-                    print("Unsupported macro \"%s\" in \"%s\". String will not be translated." % (not_parameters[0], s.sentence))
+            # parameters: set<str>
+            # Use set to ease look-up when using them as filter.
+            parameters = set(id for id in maybe_parameters if id in xref.args or id in xref.optional_args)
 
-            if len(complex_ids) > 0:
-                # 3.1. Note whether the macro contains quote marks or WML (error out if so.)
-                # 3.2. Note whether the macro contains conditional directives and which.
-                # TODO: Support it in MacroCallNode.replace()
-                for s in sentences_by_macro[macro]:
-                    print("Unsupported macro \"%s\" in \"%s\". String will not be translated." % (complex_ids[0], s.sentence))
+            # We will need to iterate over constant_macros and variable_macros.
+            # Note that it's possible for a macro with optional arguments to be listed in both.
 
-            args_variants = ReferenceHelper.get_arguments(xref, xrefs, maybe_parameters)
-            if len(args_variants) == 0:
-                for s in sentences_by_macro[macro]:
-                    print("No args found for \"%s\". String will not be translated." % s.sentence)
-            else:
+            # macro names with 0 arguments : set<str>
+            constant_macros = maybe_parameters.difference(parameters)
+            # macro names with 1+ arguments: set<str>
+            variable_macros = set.union(*complex_id_sets)
+
+            for callee_name in set.union(constant_macros, variable_macros):
+                if callee_name in GlobalWMLMacros:
+                    # TODO: LEFT_BRACE, RIGHT_BRACE?
+                    continue
+                if not callee_name in xrefs.xref:
+                    if single_file is None:
+                        print("Unknown macro {%s} called by %s. Strings using it will not be translated." % (callee_name, macro))
+                    else:
+                        raise AnalysisTooNarrowException("Macro {%s} not found")
+                if not any(map(ReferenceHelper.is_embeddable_macro, xrefs.xref[callee_name])):
+                    if single_file is None:
+                        print("No valid embeddable expansion for macro {%s} called by %s. Strings using it will not be translated." % (callee_name, macro))
+                    else:
+                        raise AnalysisTooNarrowException("No valid definition for macro {%s} found")
+
+            args_variants = ReferenceHelper.get_arguments(xref, xrefs, parameters)
+            if len(args_variants) != 0:
                 # 4. Deeply identify all macro callsites with expansions that include
                 #    strings in (1).
                 # 5. Propagate macro parameters.
@@ -373,9 +387,14 @@ def handle_macro_po_sentences(sentlist, po_sentences, start_path="", fileref_roo
     try:
         for fileref in sentences_by_file:
             resolve_strings_at(dirpath=None, single_file=fileref)
-    except Exception as ex:
-        print("Fallback to full-tree analysis")
-        resolve_strings_at(dirpath=[start_path])
+    except AnalysisTooNarrowException:
+        print("Fallback to full-tree analysis.")
+        try:
+            resolve_strings_at(dirpath=[start_path])
+        except Exception as ex:
+            # Remove the trace for AnalysisTooNarrowException.
+            raise ex from None
+            
 
     # 2.3. Otherwise, go to (4).
     # 3.3. Go to (4).
@@ -384,27 +403,51 @@ def handle_macro_po_sentences(sentlist, po_sentences, start_path="", fileref_roo
         args_variants = args_by_macro[macro]
         file_path_abs = os.path.normpath(os.path.join(fileref_root, macro[1]))
         xrefs = xrefs_by_file[file_path_abs] if file_path_abs in xrefs_by_file else xrefs_all
+        #xref = Macro(*macro).to_abs(fileref_root).get_ref(xrefs)
         for po_sentence in sentences:
-            sentence_ast = asts_by_sentence[po_sentence.sentence]
-            # 6. Evaluate the strings in (1).
+            ast = asts_by_sentence[po_sentence.sentence]
+            # print("raw sentence: (%s <-> %s)" % (po_sentence.sentence, ast))
+
+            # 5. Propagate macro parameters.
             # sub_sentences: list<(str, Macro|NoneType)>
-            sub_sentences = AST.evaluate_many_on_one(sentence_ast, args_variants, xrefs)
-            for sub_sentence, ctx in sub_sentences:
-                # assert(isinstance(ctx, Macro|NoneType))
-                po_sentence_variant = copy(po_sentence)
-                po_sentence_variant.finfos = copy(po_sentence_variant.finfos)
-                po_sentence_variant.sentence = sub_sentence
-                if '\x01' + po_sentence_variant.sentence in sentlist:
-                    # print("Ignored ref to raw sentence %s" % po_sentence_variant.sentence)
-                    # Output has already been written. TODO: FIXME?
-                    # sentlist['\x01' + po_sentence_variant.sentence].update_with_commented_string(po_sentence_variant)
-                    pass
-                elif po_sentence_variant.sentence in new_sentences:
-                    # print("New ref in processed sentence %s" % po_sentence_variant.sentence)
-                    new_sentences[po_sentence_variant.sentence].update_with_commented_string(po_sentence_variant)
-                else:
-                    # print("New sentence %s" % po_sentence_variant.sentence)
-                    new_sentences[po_sentence_variant.sentence] = po_sentence_variant
+            sub_sentences = AST.evaluate_many_on_one(ast, args_variants)
+
+            if len(sub_sentences) == 0:
+                # Ensure loop runs at least once
+                sub_sentences.append((po_sentence.sentence, None))
+            for sentence_after_args, ctx in sub_sentences:
+                used_macros = set()
+                ast = AST.parse_sentence_and_ids(sentence_after_args, used_macros, used_macros)
+                # print("sentence after args: (%s <-> %s)" % (sentence_after_args, ast))
+
+                # 6. Evaluate macro expansions.
+                # macro_replacements: list<(Reference|ReferenceLike, True, None)>
+                macro_replacements = []
+                if len(used_macros) > 0:                
+                    valid_macros = CrossRefHelper.get_valid_macros(used_macros, xrefs)
+                    macro_replacements = CrossRefHelper.get_macro_variants(valid_macros, xrefs)
+                    CrossRefHelper.deep_replace_macros(sentence_after_args, macro_replacements, xrefs)
+
+                if len(macro_replacements) == 0:
+                    # Ensure loop runs at least once
+                    macro_replacements.append(({}, None, sentence_after_args))
+                for defs, ended, sentence_after_macro in macro_replacements:
+                    # print("sentence after macro: %s" % sentence_after_macro)
+                    # assert(isinstance(ctx, Macro|NoneType))
+                    po_sentence_variant = copy(po_sentence)
+                    po_sentence_variant.finfos = copy(po_sentence_variant.finfos)
+                    po_sentence_variant.sentence = sentence_after_macro
+                    if '\x01' + po_sentence_variant.sentence in sentlist:
+                        # print("Ignored ref to raw sentence %s" % po_sentence_variant.sentence)
+                        # Output has already been written. TODO: FIXME?
+                        # sentlist['\x01' + po_sentence_variant.sentence].update_with_commented_string(po_sentence_variant)
+                        pass
+                    elif po_sentence_variant.sentence in new_sentences:
+                        # print("New ref in processed sentence %s" % po_sentence_variant.sentence)
+                        new_sentences[po_sentence_variant.sentence].update_with_commented_string(po_sentence_variant)
+                    else:
+                        # print("New sentence %s" % po_sentence_variant.sentence)
+                        new_sentences[po_sentence_variant.sentence] = po_sentence_variant
 
     for posentence in new_sentences.values():
         posentence.write(outfile, fuzzy)
