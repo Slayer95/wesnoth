@@ -1,335 +1,341 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR ORGANIZATION
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2023-05-12 18:54-0500\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2023-05-12 18:54-0500\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: data/tools/GUI.pyw:277
 msgid ""
 "Running: {0}\n"
 "Please wait..."
 msgstr ""
+"Running: {0}\n"
+"Please wait..."
 
 #: data/tools/GUI.pyw:291
 msgid "Terminate script"
-msgstr ""
+msgstr "Terminate script"
 
 #: data/tools/GUI.pyw:339
 msgid "Cut"
-msgstr ""
+msgstr "Cut"
 
 #: data/tools/GUI.pyw:344
 msgid "Copy"
-msgstr ""
+msgstr "Copy"
 
 #: data/tools/GUI.pyw:350
 msgid "Paste"
-msgstr ""
+msgstr "Paste"
 
 #: data/tools/GUI.pyw:356
 msgid "Select all"
-msgstr ""
+msgstr "Select all"
 
 #: data/tools/GUI.pyw:418
 msgid "Directory"
-msgstr ""
+msgstr "Directory"
 
 #: data/tools/GUI.pyw:430 data/tools/GUI.pyw:469
 msgid "Browse..."
-msgstr ""
+msgstr "Browse..."
 
 #: data/tools/GUI.pyw:436 data/tools/GUI.pyw:475
 msgid "Clear"
-msgstr ""
+msgstr "Clear"
 
 #: data/tools/GUI.pyw:504
 msgid "wmllint mode"
-msgstr ""
+msgstr "wmllint mode"
 
 #: data/tools/GUI.pyw:509 data/tools/GUI.pyw:872
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: data/tools/GUI.pyw:517 data/tools/GUI.pyw:880
 msgid "Perform file conversion"
-msgstr ""
+msgstr "Perform file conversion"
 
 #: data/tools/GUI.pyw:519 data/tools/GUI.pyw:882
 msgid "Dry run"
-msgstr ""
+msgstr "Dry run"
 
 #: data/tools/GUI.pyw:527 data/tools/GUI.pyw:890
 msgid "Do not perform changes"
-msgstr ""
+msgstr "Do not perform changes"
 
 #: data/tools/GUI.pyw:529
 msgid "Clean"
-msgstr ""
+msgstr "Clean"
 
 #: data/tools/GUI.pyw:537
 msgid "Delete *.bak files"
-msgstr ""
+msgstr "Delete *.bak files"
 
 #: data/tools/GUI.pyw:539
 msgid "Diff"
-msgstr ""
+msgstr "Diff"
 
 #: data/tools/GUI.pyw:547
 msgid "Show differences in converted files"
-msgstr ""
+msgstr "Show differences in converted files"
 
 #: data/tools/GUI.pyw:549
 msgid "Revert"
-msgstr ""
+msgstr "Revert"
 
 #: data/tools/GUI.pyw:557
 msgid "Revert conversions using *.bak files"
-msgstr ""
+msgstr "Revert conversions using *.bak files"
 
 #: data/tools/GUI.pyw:559 data/tools/GUI.pyw:892
 msgid "Verbosity level"
-msgstr ""
+msgstr "Verbosity level"
 
 #: data/tools/GUI.pyw:565 data/tools/GUI.pyw:898
 msgid "Terse"
-msgstr ""
+msgstr "Terse"
 
 #: data/tools/GUI.pyw:573
 msgid "List changes"
-msgstr ""
+msgstr "List changes"
 
 #: data/tools/GUI.pyw:581
 msgid "Name files before processing"
-msgstr ""
+msgstr "Name files before processing"
 
 #: data/tools/GUI.pyw:589
 msgid "Show parse details"
-msgstr ""
+msgstr "Show parse details"
 
 #: data/tools/GUI.pyw:597
 msgid "wmllint options"
-msgstr ""
+msgstr "wmllint options"
 
 #: data/tools/GUI.pyw:603
 msgid "Convert EOL characters to Unix style"
-msgstr ""
+msgstr "Convert EOL characters to Unix style"
 
 #: data/tools/GUI.pyw:611
 msgid "Don't warn about tags without side= keys"
-msgstr ""
+msgstr "Don't warn about tags without side= keys"
 
 #: data/tools/GUI.pyw:619
 msgid "Disable checks for unknown units"
-msgstr ""
+msgstr "Disable checks for unknown units"
 
 #: data/tools/GUI.pyw:627
 msgid "Disable spellchecking"
-msgstr ""
+msgstr "Disable spellchecking"
 
 #: data/tools/GUI.pyw:635
 msgid "Skip core directory"
-msgstr ""
+msgstr "Skip core directory"
 
 #: data/tools/GUI.pyw:659
 msgid "wmlscope options"
-msgstr ""
+msgstr "wmlscope options"
 
 #: data/tools/GUI.pyw:669
 msgid "Check for duplicate macro definitions"
-msgstr ""
+msgstr "Check for duplicate macro definitions"
 
 #: data/tools/GUI.pyw:677
 msgid "Check for duplicate resource files"
-msgstr ""
+msgstr "Check for duplicate resource files"
 
 #: data/tools/GUI.pyw:685
 msgid "Make definition list"
-msgstr ""
+msgstr "Make definition list"
 
 #: data/tools/GUI.pyw:693
 msgid "List files that will be processed"
-msgstr ""
+msgstr "List files that will be processed"
 
 #: data/tools/GUI.pyw:701
 msgid "Report unresolved macro references"
-msgstr ""
+msgstr "Report unresolved macro references"
 
 #: data/tools/GUI.pyw:709
 msgid "Extract help from macro definition comments"
-msgstr ""
+msgstr "Extract help from macro definition comments"
 
 #: data/tools/GUI.pyw:717
 msgid "Report all macros with untyped formals"
-msgstr ""
+msgstr "Report all macros with untyped formals"
 
 #: data/tools/GUI.pyw:725
 msgid "Show progress"
-msgstr ""
+msgstr "Show progress"
 
 #: data/tools/GUI.pyw:742
 msgid "Exclude files matching regexp:"
-msgstr ""
+msgstr "Exclude files matching regexp:"
 
 #: data/tools/GUI.pyw:759
 msgid "Exclude files not matching regexp:"
-msgstr ""
+msgstr "Exclude files not matching regexp:"
 
 #: data/tools/GUI.pyw:776
 msgid ""
 "Report only on macros referenced\n"
 "in at least n files:"
 msgstr ""
+"Report only on macros referenced\n"
+"in at least n files:"
 
 #: data/tools/GUI.pyw:795
 msgid ""
 "List actual & formal argtypes\n"
 "for calls in fname"
 msgstr ""
+"List actual & formal argtypes\n"
+"for calls in fname"
 
 #: data/tools/GUI.pyw:812
 msgid ""
 "Ignore refcount 0 on names\n"
 "matching regexp:"
 msgstr ""
+"Ignore refcount 0 on names\n"
+"matching regexp:"
 
 #: data/tools/GUI.pyw:867
 msgid "wmlindent mode"
-msgstr ""
+msgstr "wmlindent mode"
 
 #: data/tools/GUI.pyw:906
 msgid "Verbose"
-msgstr ""
+msgstr "Verbose"
 
 #: data/tools/GUI.pyw:914
 msgid "Report unchanged files"
-msgstr ""
+msgstr "Report unchanged files"
 
 #: data/tools/GUI.pyw:922
 msgid "wmlindent options"
-msgstr ""
+msgstr "wmlindent options"
 
 #: data/tools/GUI.pyw:928
 msgid ""
 "Exclude files\n"
 "matching regexp:"
 msgstr ""
+"Exclude files\n"
+"matching regexp:"
 
 #: data/tools/GUI.pyw:946
 msgid "Do not generate output"
-msgstr ""
+msgstr "Do not generate output"
 
 #: data/tools/GUI.pyw:968
 msgid "Textdomain:"
-msgstr ""
+msgstr "Textdomain:"
 
 #: data/tools/GUI.pyw:975
 msgid "Output file:"
-msgstr ""
+msgstr "Output file:"
 
 #: data/tools/GUI.pyw:981
 msgid "Options"
-msgstr ""
+msgstr "Options"
 
 #: data/tools/GUI.pyw:986
 msgid "Scan subdirectories"
-msgstr ""
+msgstr "Scan subdirectories"
 
 #: data/tools/GUI.pyw:991
 msgid "Show optional warnings"
-msgstr ""
+msgstr "Show optional warnings"
 
 #: data/tools/GUI.pyw:996
 msgid "Mark all strings as fuzzy"
-msgstr ""
+msgstr "Mark all strings as fuzzy"
 
 #: data/tools/GUI.pyw:1000
 msgid "Advanced options"
-msgstr ""
+msgstr "Advanced options"
 
 #: data/tools/GUI.pyw:1004
 msgid "Package version"
-msgstr ""
+msgstr "Package version"
 
 #: data/tools/GUI.pyw:1009
 msgid "Initial textdomain"
-msgstr ""
+msgstr "Initial textdomain"
 
 #: data/tools/GUI.pyw:1047 data/tools/GUI.pyw:1153
 msgid "Run wmllint"
-msgstr ""
+msgstr "Run wmllint"
 
 #: data/tools/GUI.pyw:1054
 msgid "Save as text..."
-msgstr ""
+msgstr "Save as text..."
 
 #: data/tools/GUI.pyw:1061
 msgid "Clear output"
-msgstr ""
+msgstr "Clear output"
 
 #: data/tools/GUI.pyw:1068
 msgid "About..."
-msgstr ""
+msgstr "About..."
 
 #: data/tools/GUI.pyw:1075
 msgid "Exit"
-msgstr ""
+msgstr "Exit"
 
 #: data/tools/GUI.pyw:1091 data/tools/GUI.pyw:1224
 msgid "wmllint"
-msgstr ""
+msgstr "wmllint"
 
 #: data/tools/GUI.pyw:1095 data/tools/GUI.pyw:1290
 msgid "wmlscope"
-msgstr ""
+msgstr "wmlscope"
 
 #: data/tools/GUI.pyw:1099 data/tools/GUI.pyw:1325
 msgid "wmlindent"
-msgstr ""
+msgstr "wmlindent"
 
 #: data/tools/GUI.pyw:1103 data/tools/GUI.pyw:1378
 msgid "wmlxgettext"
-msgstr ""
+msgstr "wmlxgettext"
 
 #: data/tools/GUI.pyw:1106
 msgid "Output"
-msgstr ""
+msgstr "Output"
 
 #: data/tools/GUI.pyw:1156
 msgid "Run wmlscope"
-msgstr ""
+msgstr "Run wmlscope"
 
 #: data/tools/GUI.pyw:1159
 msgid "Run wmlindent"
-msgstr ""
+msgstr "Run wmlindent"
 
 #: data/tools/GUI.pyw:1162
 msgid "Run wmlxgettext"
-msgstr ""
+msgstr "Run wmlxgettext"
 
 #: data/tools/GUI.pyw:1400
 msgid "Text file"
-msgstr ""
+msgstr "Text file"
 
 #: data/tools/GUI.pyw:1437
 msgid "Exit confirmation"
-msgstr ""
+msgstr "Exit confirmation"
 
 #: data/tools/GUI.pyw:1438
 msgid "Do you really want to quit?"
-msgstr ""
+msgstr "Do you really want to quit?"
 
 #: data/tools/GUI.pyw:1718
 msgid "This application must be placed into the wesnoth/data/tools directory"
-msgstr ""
-
+msgstr "This application must be placed into the wesnoth/data/tools directory"
