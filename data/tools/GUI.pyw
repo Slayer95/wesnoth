@@ -10,11 +10,14 @@
 
 # threading and subprocess are needed to run wmllint without freezing the window
 # codecs is used to save files as UTF8
+# locale and gettext provides internationalization and localization (i18n, l10n)
 # queue is needed to exchange informations between threads
 # if we use the run_tool thread to do GUI stuff we obtain weird crashes
 # This happens because Tk is a single-thread GUI
 import sys,os,threading,subprocess,codecs
 
+import locale
+import gettext
 import queue
 
 from wesnoth import version
@@ -42,6 +45,9 @@ APP_DIR,APP_NAME=os.path.split(os.path.realpath(sys.argv[0]))
 WESNOTH_ROOT_DIR=os.sep.join(APP_DIR.split(os.sep)[:-2])  # pop out "data" and "tools"
 WESNOTH_DATA_DIR=os.path.join(WESNOTH_ROOT_DIR,"data")
 WESNOTH_CORE_DIR=os.path.normpath(os.path.join(WESNOTH_DATA_DIR,"core"))
+WESNOTH_TRAN_DIR=os.path.join(WESNOTH_ROOT_DIR, "translations")
+SYSTEM_LOCALE = locale.getdefaultlocale()[0]
+_=gettext.translation('wesnoth-dev',WESNOTH_TRAN_DIR,languages=[SYSTEM_LOCALE],fallback=True).gettext
 
 def wrap_elem(line):
     """If the supplied line contains spaces, return it wrapped between double quotes"""
@@ -268,7 +274,7 @@ Self destroys when the tool thread is over"""
         frame=Frame(self)
         frame.pack(fill=BOTH,expand=YES)
         wait_label=Label(frame,
-                         text="{0} is running\nPlease wait...".format(tool),
+                         text=_("Running: {0}\nPlease wait...").format(tool),
                          justify=CENTER)
         wait_label.grid(row=0,
                         column=0,
@@ -282,7 +288,7 @@ Self destroys when the tool thread is over"""
                            padx=5,
                            pady=5)
         terminate_button=Button(frame,
-                                text="Terminate script",
+                                text=_("Terminate script"),
                                 image=ICONS["process-stop"],
                                 compound=LEFT,
                                 command=self.terminate)
@@ -330,24 +336,24 @@ If the widget isn't active, some options do not appear"""
         control_key = "Command" if self.tk.call('tk', 'windowingsystem') == "aqua" else "Ctrl"
         # str is necessary because in some instances a Tcl_Obj is returned instead of a string
         if str(widget.cget('state')) in (ACTIVE,NORMAL): # do not add if state is readonly or disabled
-            self.add_command(label="Cut",
+            self.add_command(label=_("Cut"),
                              image=ICONS['cut'],
                              compound=LEFT,
                              accelerator='%s+X' % (control_key),
                              command=lambda: self.widget.event_generate("<<Cut>>"))
-        self.add_command(label="Copy",
+        self.add_command(label=_("Copy"),
                          image=ICONS['copy'],
                          compound=LEFT,
                          accelerator='%s+C' % (control_key),
                          command=lambda: self.widget.event_generate("<<Copy>>"))
         if str(widget.cget('state')) in (ACTIVE,NORMAL):
-            self.add_command(label="Paste",
+            self.add_command(label=_("Paste"),
                              image=ICONS['paste'],
                              compound=LEFT,
                              accelerator='%s+V' % (control_key),
                              command=lambda: self.widget.event_generate("<<Paste>>"))
         self.add_separator()
-        self.add_command(label="Select all",
+        self.add_command(label=_("Select all"),
                          image=ICONS['select_all'],
                          compound=LEFT,
                          accelerator='%s+A' % (control_key),
@@ -409,7 +415,7 @@ class SelectDirectory(LabelFrame):
     def __init__(self,parent,textvariable=None,**kwargs):
         """A subclass of LabelFrame sporting a readonly Entry and a Button with a folder icon.
 It comes complete with a context menu and a directory selection screen"""
-        super().__init__(parent,text="Directory",**kwargs)
+        super().__init__(parent,text=_("Directory"),**kwargs)
         self.textvariable=textvariable
         self.dir_entry=EntryContext(self,
                                     width=40,
@@ -421,13 +427,13 @@ It comes complete with a context menu and a directory selection screen"""
         self.dir_button=Button(self,
                                image=ICONS['browse'],
                                compound=LEFT,
-                               text="Browse...",
+                               text=_("Browse..."),
                                command=self.on_browse)
         self.dir_button.pack(side=LEFT)
         self.clear_button=Button(self,
                                  image=ICONS['clear16'],
                                  compound=LEFT,
-                                 text="Clear",
+                                 text=_("Clear"),
                                  command=self.on_clear)
         self.clear_button.pack(side=LEFT)
     def on_browse(self):
@@ -460,13 +466,13 @@ It has a context menu and a save file selection dialog."""
         self.file_button=Button(self,
                                 image=ICONS['browse'],
                                 compound=LEFT,
-                                text="Browse...",
+                                text=_("Browse..."),
                                 command=self.on_browse)
         self.file_button.pack(side=LEFT)
         self.clear_button=Button(self,
                                  image=ICONS['clear16'],
                                  compound=LEFT,
-                                 text="Clear",
+                                 text=_("Clear"),
                                  command=self.on_clear)
         self.clear_button.pack(side=LEFT)
     def on_browse(self):
@@ -495,12 +501,12 @@ class WmllintTab(Frame):
         super().__init__(parent)
         self.mode_variable=IntVar()
         self.mode_frame=LabelFrame(self,
-                                   text="wmllint mode")
+                                   text=_("wmllint mode"))
         self.mode_frame.grid(row=0,
                              column=0,
                              sticky=N+E+S+W)
         self.radio_normal=Radiobutton(self.mode_frame,
-                                      text="Normal",
+                                      text=_("Normal"),
                                       variable=self.mode_variable,
                                       value=0)
         self.radio_normal.grid(row=0,
@@ -508,9 +514,9 @@ class WmllintTab(Frame):
                                sticky=W,
                                padx=10)
         self.tooltip_normal=Tooltip(self.radio_normal,
-                                    "Perform file conversion")
+                                    _("Perform file conversion"))
         self.radio_dryrun=Radiobutton(self.mode_frame,
-                                      text="Dry run",
+                                      text=_("Dry run"),
                                       variable=self.mode_variable,
                                       value=1)
         self.radio_dryrun.grid(row=1,
@@ -518,9 +524,9 @@ class WmllintTab(Frame):
                                sticky=W,
                                padx=10)
         self.tooltip_dryrun=Tooltip(self.radio_dryrun,
-                                    "Do not perform changes")
+                                    _("Do not perform changes"))
         self.radio_clean=Radiobutton(self.mode_frame,
-                                     text="Clean",
+                                     text=_("Clean"),
                                      variable=self.mode_variable,
                                      value=2)
         self.radio_clean.grid(row=2,
@@ -528,9 +534,9 @@ class WmllintTab(Frame):
                               sticky=W,
                               padx=10)
         self.tooltip_clean=Tooltip(self.radio_clean,
-                                   "Delete *.bak files")
+                                   _("Delete *.bak files"))
         self.radio_diff=Radiobutton(self.mode_frame,
-                                    text="Diff",
+                                    text=_("Diff"),
                                     variable=self.mode_variable,
                                     value=3)
         self.radio_diff.grid(row=3,
@@ -538,9 +544,9 @@ class WmllintTab(Frame):
                              sticky=W,
                              padx=10)
         self.tooltip_diff=Tooltip(self.radio_diff,
-                                  "Show differences in converted files")
+                                  _("Show differences in converted files"))
         self.radio_revert=Radiobutton(self.mode_frame,
-                                      text="Revert",
+                                      text=_("Revert"),
                                       variable=self.mode_variable,
                                       value=4)
         self.radio_revert.grid(row=4,
@@ -548,15 +554,15 @@ class WmllintTab(Frame):
                                sticky=W,
                                padx=10)
         self.tooltip_revert=Tooltip(self.radio_revert,
-                                    "Revert conversions using *.bak files")
+                                    _("Revert conversions using *.bak files"))
         self.verbosity_frame=LabelFrame(self,
-                                        text="Verbosity level")
+                                        text=_("Verbosity level"))
         self.verbosity_frame.grid(row=0,
                                   column=1,
                                   sticky=N+E+S+W)
         self.verbosity_variable=IntVar()
         self.radio_v0=Radiobutton(self.verbosity_frame,
-                                  text="Terse",
+                                  text=_("Terse"),
                                   variable=self.verbosity_variable,
                                   value=0)
         self.radio_v0.grid(row=0,
@@ -564,7 +570,7 @@ class WmllintTab(Frame):
                            sticky=W,
                            padx=10)
         self.radio_v1=Radiobutton(self.verbosity_frame,
-                                  text="List changes",
+                                  text=_("List changes"),
                                   variable=self.verbosity_variable,
                                   value=1)
         self.radio_v1.grid(row=1,
@@ -572,7 +578,7 @@ class WmllintTab(Frame):
                            sticky=W,
                            padx=10)
         self.radio_v2=Radiobutton(self.verbosity_frame,
-                                  text="Name files before processing",
+                                  text=_("Name files before processing"),
                                   variable=self.verbosity_variable,
                                   value=2)
         self.radio_v2.grid(row=2,
@@ -580,7 +586,7 @@ class WmllintTab(Frame):
                            sticky=W,
                            padx=10)
         self.radio_v3=Radiobutton(self.verbosity_frame,
-                                  text="Show parse details",
+                                  text=_("Show parse details"),
                                   variable=self.verbosity_variable,
                                   value=3)
         self.radio_v3.grid(row=3,
@@ -588,13 +594,13 @@ class WmllintTab(Frame):
                            sticky=W,
                            padx=10)
         self.options_frame=LabelFrame(self,
-                                      text="wmllint options")
+                                      text=_("wmllint options"))
         self.options_frame.grid(row=0,
                                 column=2,
                                 sticky=N+E+S+W)
         self.stripcr_variable=BooleanVar()
         self.stripcr_check=Checkbutton(self.options_frame,
-                                       text="Convert EOL characters to Unix style",
+                                       text=_("Convert EOL characters to Unix style"),
                                        variable=self.stripcr_variable)
         self.stripcr_check.grid(row=0,
                                 column=0,
@@ -602,7 +608,7 @@ class WmllintTab(Frame):
                                 padx=10)
         self.missing_variable=BooleanVar()
         self.missing_check=Checkbutton(self.options_frame,
-                                        text="Don't warn about tags without side= keys",
+                                        text=_("Don't warn about tags without side= keys"),
                                         variable=self.missing_variable)
         self.missing_check.grid(row=1,
                                  column=0,
@@ -610,7 +616,7 @@ class WmllintTab(Frame):
                                  padx=10)
         self.known_variable=BooleanVar()
         self.known_check=Checkbutton(self.options_frame,
-                                     text="Disable checks for unknown units",
+                                     text=_("Disable checks for unknown units"),
                                      variable=self.known_variable)
         self.known_check.grid(row=2,
                               column=0,
@@ -618,7 +624,7 @@ class WmllintTab(Frame):
                               padx=10)
         self.spell_variable=BooleanVar()
         self.spell_check=Checkbutton(self.options_frame,
-                                     text="Disable spellchecking",
+                                     text=_("Disable spellchecking"),
                                      variable=self.spell_variable)
         self.spell_check.grid(row=3,
                               column=0,
@@ -626,7 +632,7 @@ class WmllintTab(Frame):
                               padx=10)
         self.skip_variable=BooleanVar()
         self.skip_core=Checkbutton(self.options_frame,
-                                   text="Skip core directory",
+                                   text=_("Skip core directory"),
                                    variable=self.skip_variable,
                                    command=self.skip_core_dir_callback)
         self.skip_core.grid(row=4,
@@ -650,7 +656,7 @@ class WmlscopeTab(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         self.options_frame=LabelFrame(self,
-                                      text="wmlscope options")
+                                      text=_("wmlscope options"))
         self.options_frame.grid(row=0,
                                 column=0,
                                 sticky=N+E+S+W)
@@ -660,7 +666,7 @@ class WmlscopeTab(Frame):
                                  sticky=N+E+S+W)
         self.crossreference_variable=BooleanVar() # equivalent to warnlevel 1
         self.crossreference_check=Checkbutton(self.normal_options,
-                                              text="Check for duplicate macro definitions",
+                                              text=_("Check for duplicate macro definitions"),
                                               variable=self.crossreference_variable)
         self.crossreference_check.grid(row=0,
                                        column=0,
@@ -668,7 +674,7 @@ class WmlscopeTab(Frame):
                                        padx=10)
         self.collisions_variable=BooleanVar()
         self.collisions_check=Checkbutton(self.normal_options,
-                                          text="Check for duplicate resource files",
+                                          text=_("Check for duplicate resource files"),
                                           variable=self.collisions_variable)
         self.collisions_check.grid(row=1,
                                    column=0,
@@ -676,7 +682,7 @@ class WmlscopeTab(Frame):
                                    padx=10)
         self.definitions_variable=BooleanVar()
         self.definitions_check=Checkbutton(self.normal_options,
-                                           text="Make definition list",
+                                           text=_("Make definition list"),
                                            variable=self.definitions_variable)
         self.definitions_check.grid(row=2,
                                     column=0,
@@ -684,7 +690,7 @@ class WmlscopeTab(Frame):
                                     padx=10)
         self.listfiles_variable=BooleanVar()
         self.listfiles_check=Checkbutton(self.normal_options,
-                                         text="List files that will be processed",
+                                         text=_("List files that will be processed"),
                                          variable=self.listfiles_variable)
         self.listfiles_check.grid(row=3,
                                   column=0,
@@ -692,7 +698,7 @@ class WmlscopeTab(Frame):
                                   padx=10)
         self.unresolved_variable=BooleanVar()
         self.unresolved_check=Checkbutton(self.normal_options,
-                                          text="Report unresolved macro references",
+                                          text=_("Report unresolved macro references"),
                                           variable=self.unresolved_variable)
         self.unresolved_check.grid(row=4,
                                    column=0,
@@ -700,7 +706,7 @@ class WmlscopeTab(Frame):
                                    padx=10)
         self.extracthelp_variable=BooleanVar()
         self.extracthelp_check=Checkbutton(self.normal_options,
-                                           text="Extract help from macro definition comments",
+                                           text=_("Extract help from macro definition comments"),
                                            variable=self.extracthelp_variable)
         self.extracthelp_check.grid(row=5,
                                     column=0,
@@ -708,7 +714,7 @@ class WmlscopeTab(Frame):
                                     padx=10)
         self.unchecked_variable=BooleanVar()
         self.unchecked_check=Checkbutton(self.normal_options,
-                                         text="Report all macros with untyped formals",
+                                         text=_("Report all macros with untyped formals"),
                                          variable=self.unchecked_variable)
         self.unchecked_check.grid(row=6,
                                   column=0,
@@ -716,7 +722,7 @@ class WmlscopeTab(Frame):
                                   padx=10)
         self.progress_variable=BooleanVar()
         self.progress_check=Checkbutton(self.normal_options,
-                                        text="Show progress",
+                                        text=_("Show progress"),
                                         variable=self.progress_variable)
         self.progress_check.grid(row=7,
                                  column=0,
@@ -733,7 +739,7 @@ class WmlscopeTab(Frame):
                                       sticky=N+E+S+W)
         self.exclude_variable=BooleanVar()
         self.exclude_check=Checkbutton(self.options_with_regexp,
-                                       text="Exclude files matching regexp:",
+                                       text=_("Exclude files matching regexp:"),
                                        variable=self.exclude_variable,
                                        command=self.exclude_callback)
         self.exclude_check.grid(row=0,
@@ -750,7 +756,7 @@ class WmlscopeTab(Frame):
                                 padx=10)
         self.from_variable=BooleanVar()
         self.from_check=Checkbutton(self.options_with_regexp,
-                                    text="Exclude files not matching regexp:",
+                                    text=_("Exclude files not matching regexp:"),
                                     variable=self.from_variable,
                                     command=self.from_callback)
         self.from_check.grid(row=1,
@@ -767,7 +773,7 @@ class WmlscopeTab(Frame):
                              padx=10)
         self.refcount_variable=BooleanVar()
         self.refcount_check=Checkbutton(self.options_with_regexp,
-                                        text="Report only on macros referenced\nin at least n files:",
+                                        text=_("Report only on macros referenced\nin at least n files:"),
                                         variable=self.refcount_variable,
                                         command=self.refcount_callback)
         self.refcount_check.grid(row=2,
@@ -786,7 +792,7 @@ class WmlscopeTab(Frame):
                                 padx=10)
         self.typelist_variable=BooleanVar()
         self.typelist_check=Checkbutton(self.options_with_regexp,
-                                        text="List actual & formal argtypes\nfor calls in fname",
+                                        text=_("List actual & formal argtypes\nfor calls in fname"),
                                         variable=self.typelist_variable,
                                         command=self.typelist_callback)
         self.typelist_check.grid(row=3,
@@ -803,7 +809,7 @@ class WmlscopeTab(Frame):
                                  padx=10)
         self.force_variable=BooleanVar()
         self.force_check=Checkbutton(self.options_with_regexp,
-                                     text="Ignore refcount 0 on names\nmatching regexp:",
+                                     text=_("Ignore refcount 0 on names\nmatching regexp:"),
                                      variable=self.force_variable,
                                      command=self.force_callback)
         self.force_check.grid(row=4,
@@ -858,12 +864,12 @@ class WmlindentTab(Frame):
         super().__init__(parent)
         self.mode_variable=IntVar()
         self.mode_frame=LabelFrame(self,
-                                   text="wmlindent mode")
+                                   text=_("wmlindent mode"))
         self.mode_frame.grid(row=0,
                              column=0,
                              sticky=N+E+S+W)
         self.radio_normal=Radiobutton(self.mode_frame,
-                                      text="Normal",
+                                      text=_("Normal"),
                                       variable=self.mode_variable,
                                       value=0)
         self.radio_normal.grid(row=0,
@@ -871,9 +877,9 @@ class WmlindentTab(Frame):
                                sticky=W,
                                padx=10)
         self.tooltip_normal=Tooltip(self.radio_normal,
-                                    "Perform file conversion")
+                                    _("Perform file conversion"))
         self.radio_dryrun=Radiobutton(self.mode_frame,
-                                      text="Dry run",
+                                      text=_("Dry run"),
                                       variable=self.mode_variable,
                                       value=1)
         self.radio_dryrun.grid(row=1,
@@ -881,15 +887,15 @@ class WmlindentTab(Frame):
                                sticky=W,
                                padx=10)
         self.tooltip_dryrun=Tooltip(self.radio_dryrun,
-                                    "Do not perform changes")
+                                    _("Do not perform changes"))
         self.verbosity_frame=LabelFrame(self,
-                                        text="Verbosity level")
+                                        text=_("Verbosity level"))
         self.verbosity_frame.grid(row=0,
                                   column=1,
                                   sticky=N+E+S+W)
         self.verbosity_variable=IntVar()
         self.radio_v0=Radiobutton(self.verbosity_frame,
-                                  text="Terse",
+                                  text=_("Terse"),
                                   variable=self.verbosity_variable,
                                   value=0)
         self.radio_v0.grid(row=0,
@@ -897,7 +903,7 @@ class WmlindentTab(Frame):
                            sticky=W,
                            padx=10)
         self.radio_v1=Radiobutton(self.verbosity_frame,
-                                  text="Verbose",
+                                  text=_("Verbose"),
                                   variable=self.verbosity_variable,
                                   value=1)
         self.radio_v1.grid(row=1,
@@ -905,7 +911,7 @@ class WmlindentTab(Frame):
                            sticky=W,
                            padx=10)
         self.radio_v2=Radiobutton(self.verbosity_frame,
-                                  text="Report unchanged files",
+                                  text=_("Report unchanged files"),
                                   variable=self.verbosity_variable,
                                   value=2)
         self.radio_v2.grid(row=2,
@@ -913,13 +919,13 @@ class WmlindentTab(Frame):
                            sticky=W,
                            padx=10)
         self.options_frame=LabelFrame(self,
-                                      text="wmlindent options")
+                                      text=_("wmlindent options"))
         self.options_frame.grid(row=0,
                                 column=2,
                                 sticky=N+E+S+W)
         self.exclude_variable=BooleanVar()
         self.exclude_check=Checkbutton(self.options_frame,
-                                       text="Exclude files\nmatching regexp:",
+                                       text=_("Exclude files\nmatching regexp:"),
                                        variable=self.exclude_variable,
                                        command=self.exclude_callback)
         self.exclude_check.grid(row=1,
@@ -937,7 +943,7 @@ class WmlindentTab(Frame):
                                padx=10)
         self.quiet_variable=BooleanVar()
         self.quiet_check=Checkbutton(self.options_frame,
-                                     text="Do not generate output",
+                                     text=_("Do not generate output"),
                                      variable=self.quiet_variable)
         self.quiet_check.grid(row=2,
                               column=0,
@@ -959,48 +965,48 @@ class WmlxgettextTab(Frame):
         self.domain_and_output_frame=Frame(self)
         self.domain_and_output_frame.grid(row=0,column=0,columnspan=2,sticky=N+E+S+W)
         self.domain_label=Label(self.domain_and_output_frame,
-                                text="Textdomain:")
+                                text=_("Textdomain:"))
         self.domain_label.grid(row=0,column=0,sticky=W)
         self.domain_variable=StringVar()
         self.domain_entry=Entry(self.domain_and_output_frame,
                                 textvariable=self.domain_variable)
         self.domain_entry.grid(row=0,column=1,sticky=N+E+S+W)
         self.output_label=Label(self.domain_and_output_frame,
-                                text="Output file:")
+                                text=_("Output file:"))
         self.output_label.grid(row=1,column=0,sticky=W)
         self.output_variable=StringVar()
         self.output_frame=SelectSaveFile(self.domain_and_output_frame,self.output_variable)
         self.output_frame.grid(row=1,column=1,sticky=N+E+S+W)
         self.options_labelframe=LabelFrame(self,
-                                           text="Options")
+                                           text=_("Options"))
         self.options_labelframe.grid(row=2,column=0,sticky=N+E+S+W)
         self.recursive_variable=BooleanVar()
         self.recursive_variable.set(True)
         self.recursive_check=Checkbutton(self.options_labelframe,
-                                         text="Scan subdirectories",
+                                         text=_("Scan subdirectories"),
                                          variable=self.recursive_variable)
         self.recursive_check.grid(row=0,column=0,sticky=W)
         self.warnall_variable=BooleanVar()
         self.warnall_check=Checkbutton(self.options_labelframe,
-                                       text="Show optional warnings",
+                                       text=_("Show optional warnings"),
                                        variable=self.warnall_variable)
         self.warnall_check.grid(row=1,column=0,sticky=W)
         self.fuzzy_variable=BooleanVar()
         self.fuzzy_check=Checkbutton(self.options_labelframe,
-                                     text="Mark all strings as fuzzy",
+                                     text=_("Mark all strings as fuzzy"),
                                      variable=self.fuzzy_variable)
         self.fuzzy_check.grid(row=2,column=0,sticky=W)
         self.advanced_labelframe=LabelFrame(self,
-                                            text="Advanced options")
+                                            text=_("Advanced options"))
         self.advanced_labelframe.grid(row=2,column=1,sticky=N+E+S+W)
         self.package_version_variable=BooleanVar()
         self.package_version_check=Checkbutton(self.advanced_labelframe,
-                                               text="Package version",
+                                               text=_("Package version"),
                                                variable=self.package_version_variable)
         self.package_version_check.grid(row=0,column=0,sticky=W)
         self.initialdomain_variable=BooleanVar()
         self.initialdomain_check=Checkbutton(self.advanced_labelframe,
-                                             text="Initial textdomain",
+                                             text=_("Initial textdomain"),
                                              variable=self.initialdomain_variable,
                                              command=self.initialdomain_callback)
         self.initialdomain_check.grid(row=1,column=0,sticky=W)
@@ -1038,35 +1044,35 @@ class MainFrame(Frame):
         self.run_button.pack(side=LEFT,
                              padx=5,
                              pady=5)
-        self.run_tooltip=Tooltip(self.run_button,"Run wmllint")
+        self.run_tooltip=Tooltip(self.run_button,_("Run wmllint"))
         self.save_button=Button(self.buttonbox,
                                 image=ICONS['save'],
                                 command=self.on_save)
         self.save_button.pack(side=LEFT,
                               padx=5,
                               pady=5)
-        self.save_tooltip=Tooltip(self.save_button,"Save as text...")
+        self.save_tooltip=Tooltip(self.save_button,_("Save as text..."))
         self.clear_button=Button(self.buttonbox,
                                  image=ICONS['clear'],
                                  command=self.on_clear)
         self.clear_button.pack(side=LEFT,
                                padx=5,
                                pady=5)
-        self.clear_tooltip=Tooltip(self.clear_button,"Clear output")
+        self.clear_tooltip=Tooltip(self.clear_button,_("Clear output"))
         self.about_button=Button(self.buttonbox,
                                  image=ICONS['about'],
                                  command=self.on_about)
         self.about_button.pack(side=LEFT,
                                padx=5,
                                pady=5)
-        self.about_tooltip=Tooltip(self.about_button,"About...")
+        self.about_tooltip=Tooltip(self.about_button,_("About..."))
         self.exit_button=Button(self.buttonbox,
                                 image=ICONS['exit'],
                                 command=self.on_quit)
         self.exit_button.pack(side=RIGHT,
                               padx=5,
                               pady=5)
-        self.exit_tooltip=Tooltip(self.exit_button,"Exit")
+        self.exit_tooltip=Tooltip(self.exit_button,_("Exit"))
         self.dir_variable=StringVar()
         self.dir_frame=SelectDirectory(self,
                                        textvariable=self.dir_variable)
@@ -1082,22 +1088,22 @@ class MainFrame(Frame):
                            sticky=E+W)
         self.wmllint_tab=WmllintTab(None)
         self.notebook.add(self.wmllint_tab,
-                          text="wmllint",
+                          text=_("wmllint"),
                           sticky=N+E+S+W)
         self.wmlscope_tab=WmlscopeTab(None)
         self.notebook.add(self.wmlscope_tab,
-                          text="wmlscope",
+                          text=_("wmlscope"),
                           sticky=N+E+S+W)
         self.wmlindent_tab=WmlindentTab(None)
         self.notebook.add(self.wmlindent_tab,
-                          text="wmlindent",
+                          text=_("wmlindent"),
                           sticky=N+E+S+W)
         self.wmlxgettext_tab=WmlxgettextTab(None)
         self.notebook.add(self.wmlxgettext_tab,
-                          text="wmlxgettext",
+                          text=_("wmlxgettext"),
                           sticky=N+E+S+W)
         self.output_frame=LabelFrame(self,
-                                     text="Output")
+                                     text=_("Output"))
         self.output_frame.grid(row=3,
                                column=0,
                                sticky=N+E+S+W)
@@ -1144,16 +1150,16 @@ class MainFrame(Frame):
         # the order of the tabs is pretty obvious
         active_tab=self.notebook.index(self.notebook.select())
         if active_tab==0:
-            self.run_tooltip.set_text("Run wmllint")
+            self.run_tooltip.set_text(_("Run wmllint"))
             self.run_button.configure(command=self.on_run_wmllint)
         elif active_tab==1:
-            self.run_tooltip.set_text("Run wmlscope")
+            self.run_tooltip.set_text(_("Run wmlscope"))
             self.run_button.configure(command=self.on_run_wmlscope)
         elif active_tab==2:
-            self.run_tooltip.set_text("Run wmlindent")
+            self.run_tooltip.set_text(_("Run wmlindent"))
             self.run_button.configure(command=self.on_run_wmlindent)
         elif active_tab==3:
-            self.run_tooltip.set_text("Run wmlxgettext")
+            self.run_tooltip.set_text(_("Run wmlxgettext"))
             self.run_button.configure(command=self.on_run_wmlxgettext)
 
     def on_run_wmllint(self):
@@ -1215,7 +1221,7 @@ wmllint will be run only on the Wesnoth core directory""")
         wmllint_thread=ToolThread("wmllint",self.queue,wmllint_command_string)
         wmllint_thread.start()
         # build popup
-        dialog=Popup(self.parent,"wmllint",wmllint_thread)
+        dialog=Popup(self.parent,_("wmllint"),wmllint_thread)
 
     def on_run_wmlscope(self):
         # build the command line
@@ -1281,7 +1287,7 @@ wmlscope will be run only on the Wesnoth core directory""")
         wmlscope_thread=ToolThread("wmlscope",self.queue,wmlscope_command_string)
         wmlscope_thread.start()
         # build popup
-        dialog=Popup(self.parent,"wmlscope",wmlscope_thread)
+        dialog=Popup(self.parent,_("wmlscope"),wmlscope_thread)
 
     def on_run_wmlindent(self):
         # build the command line
@@ -1316,7 +1322,7 @@ wmlindent will be run on the Wesnoth core directory""")
         wmlindent_thread=ToolThread("wmlindent",self.queue,wmlindent_command_string)
         wmlindent_thread.start()
         # build popup
-        dialog=Popup(self.parent,"wmlindent",wmlindent_thread)
+        dialog=Popup(self.parent,_("wmlindent"),wmlindent_thread)
 
     def on_run_wmlxgettext(self):
         # build the command line and add the path of the Python interpreter
@@ -1369,7 +1375,7 @@ wmlxgettext won't be run""")
         wmlxgettext_thread=ToolThread("wmlxgettext",self.queue,wmlxgettext_command_string)
         wmlxgettext_thread.start()
         # build popup
-        dialog=Popup(self.parent,"wmlxgettext",wmlxgettext_thread)
+        dialog=Popup(self.parent,_("wmlxgettext"),wmlxgettext_thread)
 
     def update_text(self):
         """Checks periodically if the queue is empty.
@@ -1391,7 +1397,7 @@ Error code: {1}""".format(queue_item[0],queue_item[1]))
         self.after(100,self.update_text)
 
     def on_save(self):
-        fn=asksaveasfilename(defaultextension=".txt",filetypes=[("Text file","*.txt")],initialdir=".")
+        fn=asksaveasfilename(defaultextension=".txt",filetypes=[(_("Text file"),"*.txt")],initialdir=".")
         if fn:
             try:
                 with codecs.open(fn,"w","utf-8") as out:
@@ -1428,8 +1434,8 @@ Icons are taken from the Tango Desktop Project (http://tango.freedesktop.org), a
         # check if the text widget contains something
         # and ask for a confirmation if so
         if self.text.edit_modified():
-            answer = askyesno("Exit confirmation",
-                              "Do you really want to quit?",
+            answer = askyesno(_("Exit confirmation"),
+                              _("Do you really want to quit?"),
                               icon = WARNING)
             if answer:
                 ICONS.clear()
@@ -1709,5 +1715,5 @@ VEPjiOPN2tys7Y04Zj8UEAA7''')
     sys.exit(0)
 else:
     root.withdraw() # avoid showing a blank Tk window
-    showerror("Error","This application must be placed into the wesnoth/data/tools directory")
+    showerror("Error",_("This application must be placed into the wesnoth/data/tools directory"))
     sys.exit(1)
