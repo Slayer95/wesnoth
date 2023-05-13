@@ -5,6 +5,7 @@ set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM true)
 set(NORMAL_DOMAINS
 	wesnoth
 	wesnoth-anl
+	wesnoth-dev
 	wesnoth-did
 	wesnoth-dm
 	wesnoth-dw
@@ -41,6 +42,7 @@ set(DOMAINS
 # If a source file has not GETTEXT_DOMAIN it belongs to this domain.
 set(DEFAULT_DOMAIN wesnoth)
 
+set(PYXGETTEXT ${PROJECT_SOURCE_DIR}/data/tools/pyxgettext)
 set(WMLXGETTEXT ${PROJECT_SOURCE_DIR}/data/tools/wmlxgettext)
 
 ############ pot update. ###########
@@ -72,6 +74,18 @@ if(ENABLE_POT_UPDATE_TARGET)
 			DEPENDS ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES.in
 			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 			COMMENT "pot-update [${DOMAIN}]: Generated source pot file."
+		)
+
+		# Generate pot file for python data.
+		add_custom_command(
+			OUTPUT ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/${DOMAIN}.py.pot
+
+			COMMAND ${PYXGETTEXT}
+				--output-dir=${PROJECT_SOURCE_DIR}/po/${DOMAIN}
+				--output=${DOMAIN}.py.pot
+				${PROJECT_SOURCE_DIR}/data/tools/*.py*
+			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+			COMMENT "pot-update [${DOMAIN}]: Generated python pot file."
 		)
 
 		# Generate pot file for wml data.
