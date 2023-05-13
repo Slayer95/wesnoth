@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+#
+# Wrapper script around pygettext
+
+from Tools.i18n import pygettext
+
+def main(*args, **kwargs):
+    return pygettext.main(*args, **kwargs)
+
+if __name__ == '__main__':
+    main()
