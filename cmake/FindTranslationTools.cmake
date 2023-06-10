@@ -59,49 +59,7 @@ _find_translation_tool(GETTEXT_MSGCAT_EXECUTABLE msgcat)
 
 _find_translation_tool(GETTEXT_MSGATTRIB_EXECUTABLE msgattrib)
 
-_find_translation_tool(ASCIIDOC_EXECUTABLE asciidoc)
-set(ASCIIDOC_OPTIONS
-	-b docbook
-	-d book
-	-n
-	-a toc
-)
-
 _find_translation_tool(DOS2UNIX_EXECUTABLE dos2unix)
-
-_find_translation_tool(PO4A-TRANSLATE_EXECUTABLE po4a-translate)
-set(PO4A-TRANSLATE_OPTIONS
-	-f docbook
-	-k 80
-	-M utf-8
-	-L utf-8
-)
-
-_find_translation_tool(PO4A-UPDATEPO_EXECUTABLE po4a-updatepo)
-set(PO4A-UPDATEPO_OPTIONS
-	-M utf-8
-)
-
-_find_translation_tool(XSLTPROC_EXECUTABLE xsltproc)
-set(XSLTPROC_OPTIONS
-	--nonet
-	--stringparam callout.graphics 0
-	--stringparam navig.graphics 0
-	--stringparam admon.textlabel 1
-	--stringparam admon.graphics 0
-	--stringparam html.stylesheet "./styles/manual.css"
-)
-
-# added a hack to find asciidoc when using latest archlinux by searching inside the python site packages...
-find_path(ASCIIDOC_DOCBOOK_XSL_PATH
-	xhtml.xsl
-	HINTS /usr/share/asciidoc/docbook-xsl /etc/asciidoc/docbook-xsl /opt/local/etc/asciidoc/docbook-xsl /usr/lib/*/site-packages/asciidoc/resources/docbook-xsl
-	NO_DEFAULT_PATH
-)
-if(NOT ASCIIDOC_DOCBOOK_XSL_PATH)
-	message(STATUS "asciidoc DocBook XSL path not found!")
-	set(TRANSLATION_TOOLS_FOUND false)
-endif()
 
 if(NOT TRANSLATION_TOOLS_FOUND AND TranslationTools_FIND_REQUIRED)
 	message(FATAL_ERROR "Some required translation tools are not found!")

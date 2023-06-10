@@ -51,12 +51,12 @@ set(SERVER_GID "" CACHE STRING "Group id of the user who runs wesnothd")
 set(FIFO_DIR "/var/run/wesnothd" CACHE STRING "Directory for the wesnothd fifo socket file")
 
 #build options
-option(ENABLE_GAME "Enable compilation of the game" ON)
+option(ENABLE_GAME "Enable compilation of the game" OFF)
 option(ENABLE_CAMPAIGN_SERVER "Enable compilation of campaign(add-ons) server")
-option(ENABLE_SERVER "Enable compilation of MP server" ON)
+option(ENABLE_SERVER "Enable compilation of MP server" OFF)
 option(ENABLE_MYSQL "Enable building MP/add-ons servers with mysql support" OFF)
 option(ENABLE_TESTS "Build unit tests")
-option(ENABLE_NLS "Enable building of translations" ${ENABLE_GAME})
+option(ENABLE_NLS "Enable building of translations" ON)
 
 set(BOOST_VERSION "1.66")
 
@@ -558,9 +558,7 @@ endif()
 
 add_subdirectory(doc)
 
-if(GETTEXT_FOUND AND Python_FOUND AND ENABLE_NLS)
-	add_subdirectory(po)
-endif()
+add_subdirectory(po)
 
 add_subdirectory(src)
 

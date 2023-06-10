@@ -18,7 +18,7 @@ add_custom_command(
 	OUTPUT ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_CPP.in
 
 	# Write list of matching files to POTFILES_CPP.in.
-	COMMAND ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/po/FINDCPP ${DOMAIN} --initialdomain ${DEFAULT_DOMAIN} >|
+	COMMAND python38 ${PROJECT_SOURCE_DIR}/po/FINDCPP ${DOMAIN} --initialdomain ${DEFAULT_DOMAIN} >
 				${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_CPP.in
 
 	DEPENDS ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES.in.dummy
@@ -29,7 +29,7 @@ add_custom_command(
 	OUTPUT ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_PY.in
 
 	# Write list of matching files to PY.in.
-	COMMAND ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/po/FINDPY ${DOMAIN} >|
+	COMMAND python38 ${PROJECT_SOURCE_DIR}/po/FINDPY ${DOMAIN} >
 				${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_PY.in
 
 	DEPENDS ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES.in.dummy

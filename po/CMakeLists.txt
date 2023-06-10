@@ -66,9 +66,6 @@ if(ENABLE_POT_UPDATE_TARGET)
 					--files-from=${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_CPP.in
 					--output=${PROJECT_SOURCE_DIR}/po/${DOMAIN}/${DOMAIN}.cpp.pot
 			# replace the chartype
-			COMMAND sed -i
-				s/charset=CHARSET/charset=UTF-8/
-				${PROJECT_SOURCE_DIR}/po/${DOMAIN}/${DOMAIN}.cpp.pot
 			DEPENDS ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_CPP.in
 			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 			COMMENT "pot-update [${DOMAIN}]: Generating source pot file."
@@ -83,9 +80,6 @@ if(ENABLE_POT_UPDATE_TARGET)
 					--files-from=${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_PY.in
 					--output=${PROJECT_SOURCE_DIR}/po/${DOMAIN}/${DOMAIN}.py.pot
 			# replace the chartype
-			COMMAND sed -i
-				s/charset=CHARSET/charset=UTF-8/
-				${PROJECT_SOURCE_DIR}/po/${DOMAIN}/${DOMAIN}.py.pot
 			DEPENDS ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/POTFILES_PY.in
 			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 			COMMENT "pot-update [${DOMAIN}]: Generating python pot file."
@@ -98,9 +92,8 @@ if(ENABLE_POT_UPDATE_TARGET)
 				--force-po
 				--domain=${DOMAIN}
 				--directory=${PROJECT_SOURCE_DIR}/data
-				`cd ${PROJECT_SOURCE_DIR} &&
-					sh ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/FINDCFG`
-					-o ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/${DOMAIN}.wml.pot
+				--recursive
+				-o ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/${DOMAIN}.wml.pot
 			DEPENDS ${PROJECT_SOURCE_DIR}/po/${DOMAIN}/FINDCFG
 			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 			COMMENT "pot-update [${DOMAIN}]: Generating wml pot file."
