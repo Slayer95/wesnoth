@@ -1,8 +1,42 @@
+# #-#-#-#-#  wesnoth-units.cpp.pot (PACKAGE VERSION)  #-#-#-#-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Wesnoth development team
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# #-#-#-#-#  wesnoth-units.py.pot (PACKAGE VERSION)  #-#-#-#-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Wesnoth development team
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
 msgid ""
 msgstr ""
+"#-#-#-#-#  wesnoth-units.cpp.pot (PACKAGE VERSION)  #-#-#-#-#\n"
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
-"POT-Creation-Date: 2023-05-21 03:01 UTC\n"
+"POT-Creation-Date: 2023-06-10 12:52-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"#-#-#-#-#  wesnoth-units.py.pot (PACKAGE VERSION)  #-#-#-#-#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
+"POT-Creation-Date: 2023-06-10 12:52-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"#-#-#-#-#  wesnoth-units.wml.pot (PACKAGE VERSION)  #-#-#-#-#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
+"POT-Creation-Date: 2023-06-10 17:51 UTC\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11,9 +45,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. [attack]: type=impact
+#. [effect]
 #: data/campaigns/Dead_Water/units/Soldier_King.cfg:30
 #: data/campaigns/Dead_Water/units/Warrior_King.cfg:31
 #: data/campaigns/Dead_Water/units/Young_King.cfg:26
+#: data/campaigns/Liberty/scenarios/01_The_Raid.cfg:65
 #: data/campaigns/The_South_Guard/units/Horseman_Commander.cfg:41
 #: data/campaigns/The_South_Guard/units/Mounted_General.cfg:42
 #: data/core/units/dunefolk/Alchemist.cfg:35
@@ -59,10 +95,65 @@ msgstr ""
 #: data/core/units/merfolk/Enchantress.cfg:23
 #: data/core/units/merfolk/Initiate.cfg:25
 #: data/core/units/merfolk/Priestess.cfg:42
-#: data/core/units/saurians/Augur.cfg:24 data/core/units/saurians/Oracle.cfg:36
+#: data/core/units/saurians/Augur.cfg:24
+#: data/core/units/saurians/Oracle.cfg:36
 #: data/core/units/saurians/Soothsayer.cfg:25
 #: data/core/units/undead/Necro_Dark_Sorcerer.cfg:48
 msgid "staff"
+msgstr ""
+
+#. [effect]: type=fire
+#. [attack]: type=fire
+#: data/campaigns/Delfadors_Memoirs/utils/items.cfg:73
+#: data/core/units/humans/Mage_Elder.cfg:35
+msgid "lightning"
+msgstr ""
+
+#. [effect]
+#. [attack]: type=blade
+#: data/campaigns/Delfadors_Memoirs/utils/misc.cfg:130
+#: data/campaigns/Delfadors_Memoirs/utils/misc.cfg:166
+#: data/campaigns/Eastern_Invasion/units/Horse_Lord.cfg:24
+#: data/campaigns/Eastern_Invasion/units/Mounted_Warrior.cfg:23
+#: data/core/units/orcs/Ruler.cfg:27 data/core/units/orcs/Sovereign.cfg:28
+#: data/core/units/orcs/Warlord.cfg:24 data/core/units/orcs/Warrior.cfg:38
+msgid "greatsword"
+msgstr ""
+
+#. [effect]
+#. [attack]: type=pierce
+#. [attack]: type=fire
+#: data/campaigns/Delfadors_Memoirs/utils/misc.cfg:187
+#: data/campaigns/Heir_To_The_Throne/units/Commander.cfg:33
+#: data/campaigns/Heir_To_The_Throne/units/Lord.cfg:34
+#: data/campaigns/The_Rise_Of_Wesnoth/units/Noble_Commander.cfg:43
+#: data/campaigns/The_Rise_Of_Wesnoth/units/Noble_Lord.cfg:44
+#: data/campaigns/Under_the_Burning_Suns/units/humans/Human_Commander.cfg:45
+#: data/campaigns/Under_the_Burning_Suns/units/nagas/Naga_Hunter.cfg:34
+#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Archer.cfg:40
+#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Marksman.cfg:43
+#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Youth.cfg:469
+#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Youth.cfg:526
+#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Youth.cfg:583
+#: data/core/units/dunefolk/Marauder.cfg:70
+#: data/core/units/dunefolk/Raider.cfg:68 data/core/units/elves/Archer.cfg:32
+#: data/core/units/elves/Avenger.cfg:48 data/core/units/elves/Captain.cfg:43
+#: data/core/units/elves/Champion.cfg:32 data/core/units/elves/Fighter.cfg:31
+#: data/core/units/elves/Hero.cfg:31 data/core/units/elves/Marshal.cfg:48
+#: data/core/units/elves/Outrider.cfg:54 data/core/units/elves/Ranger.cfg:47
+#: data/core/units/elves/Rider.cfg:41 data/core/units/elves/Scout.cfg:41
+#: data/core/units/humans/Loyalist_Bowman.cfg:32
+#: data/core/units/humans/Woodsman.cfg:37
+#: data/core/units/humans/Woodsman_Huntsman.cfg:45
+#: data/core/units/humans/Woodsman_Poacher.cfg:42
+#: data/core/units/humans/Woodsman_Ranger.cfg:53
+#: data/core/units/humans/Woodsman_Trapper.cfg:42
+#: data/core/units/orcs/Archer.cfg:33 data/core/units/orcs/Archer.cfg:42
+#: data/core/units/orcs/Warlord.cfg:33
+#: data/core/units/undead/Skele_Banebow.cfg:40
+#: data/core/units/undead/Skele_Bone_Shooter.cfg:38
+#: data/core/units/undead/Skeleton_Archer.cfg:46
+msgid "bow"
 msgstr ""
 
 #. [attack]: type=blade
@@ -124,14 +215,6 @@ msgstr ""
 msgid "sling"
 msgstr ""
 
-#. [attack]: type=blade
-#: data/campaigns/Eastern_Invasion/units/Horse_Lord.cfg:24
-#: data/campaigns/Eastern_Invasion/units/Mounted_Warrior.cfg:23
-#: data/core/units/orcs/Ruler.cfg:27 data/core/units/orcs/Sovereign.cfg:28
-#: data/core/units/orcs/Warlord.cfg:24 data/core/units/orcs/Warrior.cfg:38
-msgid "greatsword"
-msgstr ""
-
 #. [attack]: type=impact
 #: data/campaigns/Eastern_Invasion/units/Horse_Lord.cfg:33
 #: data/campaigns/Eastern_Invasion/units/Mounted_Fighter.cfg:32
@@ -186,7 +269,8 @@ msgstr ""
 #: data/core/units/elves/Lord.cfg:26 data/core/units/elves/Marksman.cfg:29
 #: data/core/units/elves/Marshal.cfg:39 data/core/units/elves/Outrider.cfg:45
 #: data/core/units/elves/Ranger.cfg:38 data/core/units/elves/Rider.cfg:32
-#: data/core/units/elves/Scout.cfg:32 data/core/units/elves/Sharpshooter.cfg:24
+#: data/core/units/elves/Scout.cfg:32
+#: data/core/units/elves/Sharpshooter.cfg:24
 #: data/core/units/humans/Horse_Knight.cfg:23
 #: data/core/units/humans/Horse_Paladin.cfg:39
 #: data/core/units/humans/Loyalist_Cavalryman.cfg:59
@@ -202,40 +286,6 @@ msgstr ""
 #: data/core/units/orcs/Leader.cfg:27
 #: data/core/units/undead/Skele_Death_Squire.cfg:32
 msgid "sword"
-msgstr ""
-
-#. [attack]: type=pierce
-#. [attack]: type=fire
-#: data/campaigns/Heir_To_The_Throne/units/Commander.cfg:33
-#: data/campaigns/Heir_To_The_Throne/units/Lord.cfg:34
-#: data/campaigns/The_Rise_Of_Wesnoth/units/Noble_Commander.cfg:43
-#: data/campaigns/The_Rise_Of_Wesnoth/units/Noble_Lord.cfg:44
-#: data/campaigns/Under_the_Burning_Suns/units/humans/Human_Commander.cfg:45
-#: data/campaigns/Under_the_Burning_Suns/units/nagas/Naga_Hunter.cfg:34
-#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Archer.cfg:40
-#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Marksman.cfg:43
-#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Youth.cfg:469
-#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Youth.cfg:526
-#: data/campaigns/Under_the_Burning_Suns/units/quenoth/Youth.cfg:583
-#: data/core/units/dunefolk/Marauder.cfg:70
-#: data/core/units/dunefolk/Raider.cfg:68 data/core/units/elves/Archer.cfg:32
-#: data/core/units/elves/Avenger.cfg:48 data/core/units/elves/Captain.cfg:43
-#: data/core/units/elves/Champion.cfg:32 data/core/units/elves/Fighter.cfg:31
-#: data/core/units/elves/Hero.cfg:31 data/core/units/elves/Marshal.cfg:48
-#: data/core/units/elves/Outrider.cfg:54 data/core/units/elves/Ranger.cfg:47
-#: data/core/units/elves/Rider.cfg:41 data/core/units/elves/Scout.cfg:41
-#: data/core/units/humans/Loyalist_Bowman.cfg:32
-#: data/core/units/humans/Woodsman.cfg:37
-#: data/core/units/humans/Woodsman_Huntsman.cfg:45
-#: data/core/units/humans/Woodsman_Poacher.cfg:42
-#: data/core/units/humans/Woodsman_Ranger.cfg:53
-#: data/core/units/humans/Woodsman_Trapper.cfg:42
-#: data/core/units/orcs/Archer.cfg:33 data/core/units/orcs/Archer.cfg:42
-#: data/core/units/orcs/Warlord.cfg:33
-#: data/core/units/undead/Skele_Banebow.cfg:40
-#: data/core/units/undead/Skele_Bone_Shooter.cfg:38
-#: data/core/units/undead/Skeleton_Archer.cfg:46
-msgid "bow"
 msgstr ""
 
 #. [attack]: type=blade
@@ -263,6 +313,19 @@ msgstr ""
 #: data/core/units/undead/Spirit_Nightgaunt.cfg:94
 #: data/core/units/undead/Spirit_Shadow.cfg:62
 msgid "claws"
+msgstr ""
+
+#. [effect]
+#. [attack]: type=impact
+#: data/campaigns/Liberty/scenarios/01_The_Raid.cfg:253
+#: data/campaigns/Secrets_of_the_Ancients/units/Delinquent.cfg:27
+#: data/core/units/humans/Outlaw_Footpad.cfg:24
+#: data/core/units/humans/Outlaw_Ruffian.cfg:29
+#: data/core/units/humans/Outlaw_Thug.cfg:22
+#: data/core/units/merfolk/Entangler.cfg:26
+#: data/core/units/merfolk/Netcaster.cfg:25
+#: data/core/units/trolls/Troll.cfg:24
+msgid "club"
 msgstr ""
 
 #. [attack]: type=blade
@@ -368,16 +431,6 @@ msgstr ""
 msgid "touch"
 msgstr ""
 
-#. [attack]: type=impact
-#: data/campaigns/Secrets_of_the_Ancients/units/Delinquent.cfg:27
-#: data/core/units/humans/Outlaw_Footpad.cfg:24
-#: data/core/units/humans/Outlaw_Ruffian.cfg:29
-#: data/core/units/humans/Outlaw_Thug.cfg:22
-#: data/core/units/merfolk/Entangler.cfg:26
-#: data/core/units/merfolk/Netcaster.cfg:25 data/core/units/trolls/Troll.cfg:24
-msgid "club"
-msgstr ""
-
 #. [unit_type]: id=SotA Ancient Lich, race=undead
 #. [unit_type]: id=Ancient Lich, race=undead
 #: data/campaigns/Secrets_of_the_Ancients/units/Necro_Ancient_Lich.cfg:5
@@ -413,7 +466,8 @@ msgstr ""
 #: data/campaigns/Son_Of_The_Black_Eye/units/Old_Orcish_Shaman.cfg:35
 #: data/campaigns/Son_Of_The_Black_Eye/units/Orcish_Shaman.cfg:35
 #: data/campaigns/The_Rise_Of_Wesnoth/units/Vampire_Lady.cfg:36
-#: data/core/units/saurians/Augur.cfg:33 data/core/units/saurians/Oracle.cfg:45
+#: data/core/units/saurians/Augur.cfg:33
+#: data/core/units/saurians/Oracle.cfg:45
 #: data/core/units/saurians/Soothsayer.cfg:34
 msgid "curse"
 msgstr ""
@@ -433,17 +487,20 @@ msgstr ""
 #: data/campaigns/Secrets_of_the_Ancients/units/SotA_Soulless.cfg:247
 #: data/campaigns/Secrets_of_the_Ancients/units/SotA_Soulless.cfg:276
 #: data/campaigns/Under_the_Burning_Suns/units/monsters/Alien_Minion.cfg:31
-#: data/core/units/bats/Bat_Blood.cfg:117 data/core/units/bats/Bat_Dread.cfg:32
+#: data/core/units/bats/Bat_Blood.cfg:117
+#: data/core/units/bats/Bat_Dread.cfg:32
 #: data/core/units/bats/Bat_Vampire.cfg:116
 #: data/core/units/goblins/Direwolf_Rider.cfg:32
 #: data/core/units/goblins/Knight.cfg:34
 #: data/core/units/goblins/Pillager.cfg:32
 #: data/core/units/goblins/Wolf_Rider.cfg:46
-#: data/core/units/monsters/Ant.cfg:32 data/core/units/monsters/Ant_Fire.cfg:69
+#: data/core/units/monsters/Ant.cfg:32
+#: data/core/units/monsters/Ant_Fire.cfg:69
 #: data/core/units/monsters/Ant_Firebane.cfg:70
 #: data/core/units/monsters/Ant_Firebomb.cfg:72
 #: data/core/units/monsters/Ant_Soldier.cfg:38
-#: data/core/units/monsters/Bear.cfg:42 data/core/units/monsters/Caribe.cfg:114
+#: data/core/units/monsters/Bear.cfg:42
+#: data/core/units/monsters/Caribe.cfg:114
 #: data/core/units/monsters/Caribe_Hunter.cfg:115
 #: data/core/units/monsters/Caribe_Nibbler.cfg:129
 #: data/core/units/monsters/Giant_Spider.cfg:28
@@ -628,8 +685,9 @@ msgstr ""
 #: data/core/units/dwarves/Fighter.cfg:65 data/core/units/dwarves/Lord.cfg:57
 #: data/core/units/dwarves/Runemaster.cfg:29
 #: data/core/units/dwarves/Runesmith.cfg:28
-#: data/core/units/dwarves/Steelclad.cfg:57 data/core/units/trolls/Great.cfg:25
-#: data/core/units/trolls/Hero.cfg:25 data/core/units/trolls/Warrior.cfg:25
+#: data/core/units/dwarves/Steelclad.cfg:57
+#: data/core/units/trolls/Great.cfg:25 data/core/units/trolls/Hero.cfg:25
+#: data/core/units/trolls/Warrior.cfg:25
 msgid "hammer"
 msgstr ""
 
@@ -652,7 +710,8 @@ msgstr ""
 #: data/campaigns/The_South_Guard/units/Junior_Commander.cfg:30
 #: data/campaigns/Under_the_Burning_Suns/units/quenoth/Fighter.cfg:29
 #: data/campaigns/Under_the_Burning_Suns/units/quenoth/Fighter.cfg:45
-#: data/core/units/drakes/Clasher.cfg:33 data/core/units/drakes/Thrasher.cfg:31
+#: data/core/units/drakes/Clasher.cfg:33
+#: data/core/units/drakes/Thrasher.cfg:31
 #: data/core/units/dunefolk/Harrier.cfg:31
 #: data/core/units/dunefolk/Skirmisher.cfg:32
 #: data/core/units/dunefolk/Spearguard.cfg:30
@@ -662,14 +721,15 @@ msgstr ""
 #: data/core/units/dwarves/Sentinel.cfg:38
 #: data/core/units/dwarves/Stalwart.cfg:33
 #: data/core/units/goblins/Impaler.cfg:28
-#: data/core/units/goblins/Impaler.cfg:40 data/core/units/goblins/Rouser.cfg:30
+#: data/core/units/goblins/Impaler.cfg:40
+#: data/core/units/goblins/Rouser.cfg:30
 #: data/core/units/goblins/Spearman.cfg:26
 #: data/core/units/goblins/Spearman.cfg:36
 #: data/core/units/humans/Horseman.cfg:23
 #: data/core/units/humans/Loyalist_Javelineer.cfg:30
 #: data/core/units/humans/Loyalist_Spearman.cfg:85
-#: data/core/units/merfolk/Hoplite.cfg:35 data/core/units/merfolk/Hunter.cfg:24
-#: data/core/units/merfolk/Hunter.cfg:32
+#: data/core/units/merfolk/Hoplite.cfg:35
+#: data/core/units/merfolk/Hunter.cfg:24 data/core/units/merfolk/Hunter.cfg:32
 #: data/core/units/merfolk/Javelineer.cfg:23
 #: data/core/units/merfolk/Javelineer.cfg:31
 #: data/core/units/merfolk/Spearman.cfg:22
@@ -884,6 +944,16 @@ msgstr ""
 msgid "bolas"
 msgstr ""
 
+#. [world_conquest_data]
+#: data/campaigns/World_Conquest/era/factions/The_Scourge.cfg:18
+msgid "Young Ogre, Rebels and Northerners"
+msgstr ""
+
+#. [world_conquest_data]
+#: data/campaigns/World_Conquest/era/factions/The_Trust.cfg:18
+msgid "Dune Burner, Rebels and Undead"
+msgstr ""
+
 #. [unit_type]: id=Blood Bat, race=bats
 #: data/core/units/bats/Bat_Blood.cfg:4
 msgid "Blood Bat"
@@ -1062,7 +1132,8 @@ msgstr ""
 
 #. [attack]: type=blade
 #: data/core/units/drakes/Blademaster.cfg:27
-#: data/core/units/drakes/Clasher.cfg:24 data/core/units/drakes/Enforcer.cfg:34
+#: data/core/units/drakes/Clasher.cfg:24
+#: data/core/units/drakes/Enforcer.cfg:34
 #: data/core/units/drakes/Thrasher.cfg:22
 msgid "war talon"
 msgstr ""
@@ -1121,8 +1192,9 @@ msgstr ""
 #. [attack]: type=pierce
 #. [attack]: type=blade
 #: data/core/units/drakes/Enforcer.cfg:52
-#: data/core/units/merfolk/Fighter.cfg:22 data/core/units/merfolk/Triton.cfg:24
-#: data/core/units/merfolk/Triton.cfg:33 data/core/units/merfolk/Warrior.cfg:22
+#: data/core/units/merfolk/Fighter.cfg:22
+#: data/core/units/merfolk/Triton.cfg:24 data/core/units/merfolk/Triton.cfg:33
+#: data/core/units/merfolk/Warrior.cfg:22
 msgid "trident"
 msgstr ""
 
@@ -1142,8 +1214,8 @@ msgstr ""
 
 #. [attack]: type=blade
 #: data/core/units/drakes/Fighter.cfg:24
-#: data/core/units/drakes/Flameheart.cfg:30 data/core/units/drakes/Flare.cfg:29
-#: data/core/units/drakes/Warrior.cfg:25
+#: data/core/units/drakes/Flameheart.cfg:30
+#: data/core/units/drakes/Flare.cfg:29 data/core/units/drakes/Warrior.cfg:25
 msgid "war blade"
 msgstr ""
 
@@ -1217,8 +1289,8 @@ msgid ""
 msgstr ""
 
 #. [attack]: type=impact
-#: data/core/units/drakes/Glider.cfg:29 data/core/units/drakes/Hurricane.cfg:51
-#: data/core/units/drakes/Sky.cfg:50
+#: data/core/units/drakes/Glider.cfg:29
+#: data/core/units/drakes/Hurricane.cfg:51 data/core/units/drakes/Sky.cfg:50
 #: data/core/units/monsters/Wild_Wyvern.cfg:86
 msgid "slam"
 msgstr ""
@@ -2101,12 +2173,16 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Dwarvish Fighter, race=dwarf
+#. [message]: speaker=narrator
 #: data/core/units/dwarves/Fighter.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:562
 msgid "Dwarvish Fighter"
 msgstr ""
 
 #. [unit_type]: id=Dwarvish Guardsman, race=dwarf
+#. [message]: speaker=narrator
 #: data/core/units/dwarves/Guardsman.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:563
 msgid "Dwarvish Guardsman"
 msgstr ""
 
@@ -2226,7 +2302,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Dwarvish Thunderer, race=dwarf
+#. [message]: speaker=narrator
 #: data/core/units/dwarves/Thunderer.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:564
 msgid "Dwarvish Thunderer"
 msgstr ""
 
@@ -2251,12 +2329,16 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Dwarvish Ulfserker, race=dwarf
+#. [message]: speaker=narrator
 #: data/core/units/dwarves/Ulfserker.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:565
 msgid "Dwarvish Ulfserker"
 msgstr ""
 
 #. [unit_type]: id=Elvish Archer, race=elf
+#. [message]: speaker=narrator
 #: data/core/units/elves/Archer.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:592
 msgid "Elvish Archer"
 msgstr ""
 
@@ -2393,8 +2475,8 @@ msgid ""
 msgstr ""
 
 #. [attack]: type=impact
-#: data/core/units/elves/Enchantress.cfg:36 data/core/units/elves/Shaman.cfg:42
-#: data/core/units/elves/Sorceress.cfg:36
+#: data/core/units/elves/Enchantress.cfg:36
+#: data/core/units/elves/Shaman.cfg:42 data/core/units/elves/Sorceress.cfg:36
 #: data/core/units/monsters/Caribe_Hunter.cfg:124
 #: data/core/units/wose/Wose_Shaman.cfg:43
 msgid "entangle"
@@ -2408,7 +2490,9 @@ msgid "faerie fire"
 msgstr ""
 
 #. [unit_type]: id=Elvish Fighter, race=elf
+#. [message]: speaker=narrator
 #: data/core/units/elves/Fighter.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:593
 msgid "Elvish Fighter"
 msgstr ""
 
@@ -2667,7 +2751,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Elvish Scout, race=elf
+#. [message]: speaker=narrator
 #: data/core/units/elves/Scout.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:594
 msgid "Elvish Scout"
 msgstr ""
 
@@ -2687,7 +2773,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Elvish Shaman, race=elf
+#. [message]: speaker=narrator
 #: data/core/units/elves/Shaman.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_leader_options.cfg:595
 msgid "female^Elvish Shaman"
 msgstr ""
 
@@ -3052,7 +3140,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Horseman, race=human
+#. [message]: speaker=unit
 #: data/core/units/humans/Horseman.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_research_options.cfg:78
 msgid "Horseman"
 msgstr ""
 
@@ -3069,7 +3159,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Bowman, race=human
+#. [message]: speaker=unit
 #: data/core/units/humans/Loyalist_Bowman.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_research_options.cfg:73
 msgid "Bowman"
 msgstr ""
 
@@ -3116,7 +3208,9 @@ msgid "crossbow"
 msgstr ""
 
 #. [unit_type]: id=Cavalryman, race=human
+#. [message]: speaker=unit
 #: data/core/units/humans/Loyalist_Cavalryman.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_research_options.cfg:77
 msgid "Cavalryman"
 msgstr ""
 
@@ -3170,7 +3264,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Fencer, race=human
+#. [message]: speaker=unit
 #: data/core/units/humans/Loyalist_Fencer.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_research_options.cfg:74
 msgid "Fencer"
 msgstr ""
 
@@ -3251,7 +3347,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Heavy Infantryman, race=human
+#. [message]: speaker=unit
 #: data/core/units/humans/Loyalist_Heavy_Infantryman.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_research_options.cfg:75
 msgid "Heavy Infantryman"
 msgstr ""
 
@@ -3438,7 +3536,9 @@ msgid "Compared to other loyalists, Royal Guards have more movement points."
 msgstr ""
 
 #. [unit_type]: id=Sergeant, race=human
+#. [message]: speaker=unit
 #: data/core/units/humans/Loyalist_Sergeant.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_research_options.cfg:76
 msgid "Sergeant"
 msgstr ""
 
@@ -3471,7 +3571,9 @@ msgid ""
 msgstr ""
 
 #. [unit_type]: id=Spearman, race=human
+#. [message]: speaker=unit
 #: data/core/units/humans/Loyalist_Spearman.cfg:4
+#: data/multiplayer/scenarios/ANL_utils/ANL_research_options.cfg:72
 msgid "Spearman"
 msgstr ""
 
@@ -3537,7 +3639,8 @@ msgid ""
 msgstr ""
 
 #. [attack]: type=fire
-#: data/core/units/humans/Mage.cfg:37 data/core/units/humans/Mage_Silver.cfg:47
+#: data/core/units/humans/Mage.cfg:37
+#: data/core/units/humans/Mage_Silver.cfg:47
 msgid "missile"
 msgstr ""
 
@@ -3598,11 +3701,6 @@ msgid ""
 "Once great, Elder Magi have seen their power a little diminished from "
 "wearying years of battle. Nevertheless they remain feared on the battlefield "
 "on account of their powerful lightning bolts."
-msgstr ""
-
-#. [attack]: type=fire
-#: data/core/units/humans/Mage_Elder.cfg:35
-msgid "lightning"
 msgstr ""
 
 #. [unit_type]: id=Great Mage, race=human
@@ -4164,7 +4262,8 @@ msgstr ""
 
 #. [attack]: type=impact
 #: data/core/units/merfolk/Enchantress.cfg:32
-#: data/core/units/merfolk/Initiate.cfg:34 data/core/units/merfolk/Siren.cfg:40
+#: data/core/units/merfolk/Initiate.cfg:34
+#: data/core/units/merfolk/Siren.cfg:40
 #: data/core/units/monsters/Seahorse.cfg:43
 msgid "water spray"
 msgstr ""

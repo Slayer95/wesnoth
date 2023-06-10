@@ -1,8 +1,42 @@
+# #-#-#-#-#  wesnoth-sof.cpp.pot (PACKAGE VERSION)  #-#-#-#-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Wesnoth development team
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# #-#-#-#-#  wesnoth-sof.py.pot (PACKAGE VERSION)  #-#-#-#-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Wesnoth development team
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
 msgid ""
 msgstr ""
+"#-#-#-#-#  wesnoth-sof.cpp.pot (PACKAGE VERSION)  #-#-#-#-#\n"
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
-"POT-Creation-Date: 2023-05-21 03:01 UTC\n"
+"POT-Creation-Date: 2023-06-10 12:52-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"#-#-#-#-#  wesnoth-sof.py.pot (PACKAGE VERSION)  #-#-#-#-#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
+"POT-Creation-Date: 2023-06-10 12:52-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"#-#-#-#-#  wesnoth-sof.wml.pot (PACKAGE VERSION)  #-#-#-#-#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
+"POT-Creation-Date: 2023-06-10 17:49 UTC\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3997,10 +4031,12 @@ msgid ""
 msgstr ""
 
 #. [attack]: type=blade
+#. [attack]: type=pierce
 #: data/campaigns/Sceptre_of_Fire/units/Cave_Wyrm.cfg:78
 #: data/campaigns/Sceptre_of_Fire/units/Cave_Wyrmlet.cfg:76
 #: data/campaigns/Sceptre_of_Fire/units/Red_Wyrm.cfg:82
 #: data/campaigns/Sceptre_of_Fire/units/Red_Wyrmlet.cfg:81
+#: data/campaigns/Winds_of_Fate/units/Wyrm.cfg:74
 msgid "fangs"
 msgstr ""
 
@@ -4009,6 +4045,7 @@ msgstr ""
 #: data/campaigns/Sceptre_of_Fire/units/Cave_Wyrmlet.cfg:85
 #: data/campaigns/Sceptre_of_Fire/units/Red_Wyrm.cfg:91
 #: data/campaigns/Sceptre_of_Fire/units/Red_Wyrmlet.cfg:90
+#: data/campaigns/Winds_of_Fate/units/Wyrm.cfg:86
 msgid "breath"
 msgstr ""
 
@@ -4225,4 +4262,18 @@ msgid ""
 "Thursagan's Rune Mastery: while Thursagan is on a keep, selecting an "
 "adjacent dwarf opens a dialog for obtaining temporary upgrades which last "
 "until the end of the scenario."
+msgstr ""
+
+#. [unit_type]: id=Wyrm, race=monster
+#: data/campaigns/Winds_of_Fate/units/Wyrm.cfg:5
+msgid "Wyrm"
+msgstr ""
+
+#. [unit_type]: id=Wyrm, race=monster
+#: data/campaigns/Winds_of_Fate/units/Wyrm.cfg:9
+msgid ""
+"Wyrms are strange beasts, stout serpents with wings, but no legs. They are "
+"relatively rare, and their presence is attributed to some eccentric wizard "
+"or dragon. Mature Wyrms have excellent control of their fire breath attack, "
+"as if they are themselves miniature dragons."
 msgstr ""

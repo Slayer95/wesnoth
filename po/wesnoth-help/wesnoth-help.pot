@@ -4,25 +4,40 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# #-#-#-#-#  wesnoth-help.py.pot (PACKAGE VERSION)  #-#-#-#-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Wesnoth development team
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "#-#-#-#-#  wesnoth-help.cpp.pot (PACKAGE VERSION)  #-#-#-#-#\n"
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
-"POT-Creation-Date: 2023-05-20 22:01-0500\n"
+"POT-Creation-Date: 2023-06-10 12:52-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"#-#-#-#-#  wesnoth-help.py.pot (PACKAGE VERSION)  #-#-#-#-#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
+"POT-Creation-Date: 2023-06-10 12:52-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "#-#-#-#-#  wesnoth-help.wml.pot (PACKAGE VERSION)  #-#-#-#-#\n"
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.wesnoth.org/\n"
-"POT-Creation-Date: 2023-05-21 03:01 UTC\n"
+"POT-Creation-Date: 2023-06-10 17:47 UTC\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -649,10 +664,10 @@ msgstr ""
 msgid ""
 "editor^<bold>text='Movement Overlays'</bold>\n"
 "\n"
-"<img>src='terrain/grass/green.png~BLIT(terrain/impassable-editor."
-"png~O(0.5))' align=here box=yes</img> <img>src='terrain/grass/green."
-"png~BLIT(terrain/unwalkable-editor.png~O(0.5))' align=here box=yes</img> "
-"Impassable and Unwalkable\n"
+"<img>src='terrain/grass/green.png~BLIT(terrain/impassable-editor.png~O"
+"(0.5))' align=here box=yes</img> <img>src='terrain/grass/green.png~BLIT"
+"(terrain/unwalkable-editor.png~O(0.5))' align=here box=yes</img> Impassable "
+"and Unwalkable\n"
 "\n"
 "While easily noticeable in the editor, these are invisible in the game, so "
 "the mixed terrains created by them look like the base terrain. They create a "
@@ -668,9 +683,8 @@ msgid ""
 "editor^<bold>text='Castle Overlays'</bold>\n"
 "\n"
 "<img>src='terrain/grass/green.png~BLIT(terrain/castle/castle-overlay-editor."
-"png~O(0.5))' align=here box=yes</img> <img>src='terrain/grass/green."
-"png~BLIT(terrain/castle/keep-overlay-editor.png~O(0.5))' align=here box=yes</"
-"img>\n"
+"png~O(0.5))' align=here box=yes</img> <img>src='terrain/grass/green.png~BLIT"
+"(terrain/castle/keep-overlay-editor.png~O(0.5))' align=here box=yes</img>\n"
 "\n"
 "Adding either of these overlays to a passable hex allows units to be "
 "recruited onto a hex. The keep also allows a leader to recruit from there.\n"
@@ -1324,7 +1338,8 @@ msgstr ""
 
 #. [section]: id=calendar
 #. [topic]: id=..calendar
-#: data/core/encyclopedia/calendar.cfg:5 data/core/encyclopedia/calendar.cfg:13
+#: data/core/encyclopedia/calendar.cfg:5
+#: data/core/encyclopedia/calendar.cfg:13
 msgid "Calendar"
 msgstr ""
 
@@ -6089,7 +6104,7 @@ msgstr ""
 #. non-breaking spaces to prevent unpleasant line breaks (issue #3256).  In the
 #. translation use non-breaking spaces as appropriate for the target language.
 #: src/help/help_topic_generators.cpp:595
-msgid "Required XP:"
+msgid "Required\\u00a0XP:"
 msgstr ""
 
 #: src/help/help_topic_generators.cpp:613
